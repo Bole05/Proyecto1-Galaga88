@@ -111,3 +111,14 @@ applications, and to alter it and redistribute it freely, subject to the followi
   3. This notice may not be removed or altered from any source distribution.
 
 #readme.md, es el sitio para describir nuestro juego, por ejemplo en qué sistema de movil,ordenador etc disponible, qué vamos hacer, de qué sobre el juego etc, es a dir es un sitio para escribir información sobre nuetro juego.
+
+
+在Game Loop这个pdf中， 它告诉我们，所以的电子游戏都是通过gameloop循环来实现的，因为电子游戏不像传统应用需要用户给出指令才会执行下一步，电子游戏即使你不给出任何指令，游戏后台还会不断去刷新和计算画面。
+所以我们需要不同的代码告诉电脑，我们初始情况，用户输入了什么，这个指令会造成什么影响，然后渲染，就是在屏幕上画出来，运行出来，最后就是清理。
+
+这些不同的情况我们所使用的代码是
+Setup()-->初始化游戏
+Input()-->用户输入的指令
+Update()-->更具用户的指令更新数据
+Render()-->把这些指令展示出来
+Cleanup()-->清理
