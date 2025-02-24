@@ -109,3 +109,5 @@ applications, and to alter it and redistribute it freely, subject to the followi
   as being the original software.
 
   3. This notice may not be removed or altered from any source distribution.
+
+#readme.md, es el sitio para describir nuestro juego, por ejemplo en qué sistema de movil,ordenador etc disponible, qué vamos hacer, de qué sobre el juego etc, es a dir es un sitio para escribir información sobre nuetro juego.
