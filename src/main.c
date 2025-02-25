@@ -1,55 +1,139 @@
-/*
-Raylib example file.
-This is an example main file for a simple raylib project.
-Use this as a starting point or replace it with your code.
+#include "raylib.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
-by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit https://creativecommons.org/publicdomain/zero/1.0/
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+#define PLAYER_SPEED 5
+#define BULLET_SPEED 7
+#define ENEMY_SPEED 2
+#define MAX_BULLETS 10
+#define MAX_ENEMIES 10
 
-*/
+typedef struct {
+    Rectangle rect;
+    bool active;
+} Bullet;
 
-#include<iostream>
-#include <raylib.h>
+typedef struct {
+    Rectangle rect;
+    bool active;
+} Enemy;
 
-#include <resource_dir.h>	// utility header for SearchAndSetResourceDir
-using namespace std;
-int main ()
-{
-	// Tell the window to use vsync and work on high DPI displays
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+typedef enum { MENU, LEVEL1, LEVEL2, BOSS, GAMEOVER, WIN } GameState;
 
-	// Create the window and OpenGL context
-	InitWindow(1280, 800, "Hello Raylib");
+void InitGame();
+void UpdateGame();
+void DrawGame();
 
-	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
-	SearchAndSetResourceDir("resources");
+GameState gameState = MENU;
+Rectangle player;
+Bullet bullets[MAX_BULLETS];
+Enemy enemies[MAX_ENEMIES];
+Rectangle boss;
+bool bossActive = false;
 
-	// Load a texture from the resources directory
-	Texture wabbit = LoadTexture("Player principal.png");
-	
-	// game loop
-	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
-	{
-		// drawing
-		BeginDrawing();
-
-		// Setup the back buffer for drawing (clear color and depth buffers)
-		ClearBackground(BLACK);
-
-		// draw some text using the default font
-		DrawText("Hello Raylib", 200,200,20,WHITE);
-
-		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
-		
-		// end the frame and get ready for the next one  (display frame, poll input, etc...)
-		EndDrawing();
-	}
-
-	// cleanup
-	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
-
-	// destroy the window and cleanup the OpenGL context
-	CloseWindow();
-	return 0;
+int main(void) {
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
+    InitGame();
+    SetTargetFPS(60);
+    
+    while (!WindowShouldClose()) {
+        UpdateGame();
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawGame();
+        EndDrawing();
+    }
+    
+    CloseWindow();
+    return 0;
 }
+
+void InitGame() {
+    player = (Rectangle){ SCREEN_WIDTH/2 - 20, SCREEN_HEIGHT - 50, 40, 40 };
+    for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        enemies[i].rect = (Rectangle){ rand() % (SCREEN_WIDTH - 40), rand() % 200, 40, 40 };
+        enemies[i].active = true;
+    }
+    boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
+    bossActive = false;
+}
+
+void UpdateGame() {
+    if (gameState == MENU && IsKeyPressed(KEY_ENTER)) gameState = LEVEL1;
+    
+    if (gameState == LEVEL1 || gameState == LEVEL2 || gameState == BOSS) {
+        if (IsKeyDown(KEY_LEFT) && player.x > 0) player.x -= PLAYER_SPEED;
+        if (IsKeyDown(KEY_RIGHT) && player.x < SCREEN_WIDTH - player.width) player.x += PLAYER_SPEED;
+        
+        if (IsKeyPressed(KEY_SPACE)) {
+            for (int i = 0; i < MAX_BULLETS; i++) {
+                if (!bullets[i].active) {
+                    bullets[i].rect = (Rectangle){ player.x + 15, player.y, 10, 20 };
+                    bullets[i].active = true;
+                    break;
+                }
+            }
+        }
+        
+        for (int i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].active) {
+                bullets[i].rect.y -= BULLET_SPEED;
+                if (bullets[i].rect.y < 0) bullets[i].active = false;
+            }
+        }
+        
+        for (int i = 0; i < MAX_ENEMIES; i++) {
+            if (enemies[i].active) {
+                enemies[i].rect.y += ENEMY_SPEED;
+                if (enemies[i].rect.y > SCREEN_HEIGHT) {
+                    enemies[i].rect.y = 0;
+                    enemies[i].rect.x = rand() % (SCREEN_WIDTH - 40);
+                }
+                for (int j = 0; j < MAX_BULLETS; j++) {
+                    if (bullets[j].active && CheckCollisionRecs(bullets[j].rect, enemies[i].rect)) {
+                        enemies[i].active = false;
+                        bullets[j].active = false;
+                    }
+                }
+            }
+        }
+        
+        bool allEnemiesDefeated = true;
+        for (int i = 0; i < MAX_ENEMIES; i++) if (enemies[i].active) allEnemiesDefeated = false;
+        
+        if (allEnemiesDefeated) {
+            if (gameState == LEVEL1) gameState = LEVEL2;
+            else if (gameState == LEVEL2) {
+                gameState = BOSS;
+                bossActive = true;
+            }
+        }
+        
+        if (bossActive) {
+            boss.y += 1;
+            for (int i = 0; i < MAX_BULLETS; i++) {
+                if (bullets[i].active && CheckCollisionRecs(bullets[i].rect, boss)) {
+                    bossActive = false;
+                    gameState = WIN;
+                }
+            }
+        }
+    }
+}
+
+void DrawGame() {
+    if (gameState == MENU) {
+        DrawText("Press ENTER to Start", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2, 20, WHITE);
+    } else if (gameState == LEVEL1 || gameState == LEVEL2 || gameState == BOSS) {
+        DrawRectangleRec(player, BLUE);
+        for (int i = 0; i < MAX_BULLETS; i++) if (bullets[i].active) DrawRectangleRec(bullets[i].rect, RED);
+        for (int i = 0; i < MAX_ENEMIES; i++) if (enemies[i].active) DrawRectangleRec(enemies[i].rect, GREEN);
+        if (bossActive) DrawRectangleRec(boss, PURPLE);
+    } else if (gameState == WIN) {
+        DrawText("YOU WIN!", SCREEN_WIDTH/2 - 50, SCREEN_HEIGHT/2, 20, GREEN);
+    }
+}
+

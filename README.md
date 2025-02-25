@@ -122,3 +122,75 @@ Input()-->用户输入的指令
 Update()-->更具用户的指令更新数据
 Render()-->把这些指令展示出来
 Cleanup()-->清理
+
+
+#include <raylib.h>
+#include <vector>
+#include <resource_dir.h>	// utility header for SearchAndSetResourceDir
+using namespace std;
+int main ()
+{
+	// Tell the window to use vsync and work on high DPI displays
+	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+
+	// Create the window and OpenGL context
+	InitWindow(1280, 800, "Hello Raylib");//crear el tamaño del juego, es d dir de que grande es el juego
+
+	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
+	SearchAndSetResourceDir("resources");
+
+	// Load a texture from the resources directory
+	Texture wabbit = LoadTexture("Player principal.png");
+	
+	// game loop
+	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
+	{
+		// drawing
+		BeginDrawing();
+
+		// Setup the back buffer for drawing (clear color and depth buffers)
+		ClearBackground(BLACK);
+
+		// draw some text using the default font
+		DrawText("Hello Raylib", 200,200,20,WHITE);
+
+		// draw our texture to the screen
+		DrawTexture(wabbit, 400, 200, WHITE);
+		
+		// end the frame and get ready for the next one  (display frame, poll input, etc...)
+		EndDrawing();
+	}
+
+	// cleanup
+	// unload our texture so it can be cleaned up
+	UnloadTexture(wabbit);
+
+	// destroy the window and cleanup the OpenGL context
+	CloseWindow();
+	return 0;
+}
+int main(){
+	InitWindow(800,600,"Galaga 88 Origen Vertion" );
+	SetTargetFPS(60);
+while(!WindowShouldClose()){//si el jugador no se cierra el juego
+	BeginDrawing();
+	ClearBackground();
+	EndDrawing();
+
+}
+
+CloseWindow();
+return 0;
+
+
+
+
+	bool end=false;
+	while(!end){
+     Setup(){
+
+	 }
+    
+	
+	}
+}
