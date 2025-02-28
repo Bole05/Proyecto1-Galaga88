@@ -57,7 +57,10 @@ void EnemyAttack();
 void UpdateBoss();
 
 int main(void) {
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+    SearchAndSetResourceDir("resources");
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
+    Texture Menu=LoadTexture("galaga 88.png");
     InitGame();
     SetTargetFPS(60);
 
@@ -65,6 +68,8 @@ int main(void) {
         UpdateGame();
         BeginDrawing();
         ClearBackground(BLACK);
+        DrawTexture(Menu, 400, 200, WHITE);
+        
         DrawGame();
         EndDrawing();
     }
