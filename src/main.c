@@ -1,6 +1,9 @@
 #include "raylib.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <resource_dir.h>
+
+
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -125,11 +128,11 @@ void UpdateGame() {
 
 
     void UpdateEnemies() {
-        bool allEnemiesDefeated = true; // Variable para verificar si todos los enemigos están derrotados
+        bool allEnemiesDefeated = true; // Variable para verificar si todos los enemigos estï¿½n derrotados
 
         for (int i = 0; i < MAX_ENEMIES; i++) {
             if (enemies[i].active) {
-                allEnemiesDefeated = false; // Si hay al menos un enemigo activo, no todos están derrotados
+                allEnemiesDefeated = false; // Si hay al menos un enemigo activo, no todos estï¿½n derrotados
 
                 enemies[i].rect.x += enemies[i].direction * enemySpeed;
                 if (enemies[i].rect.x < 0 || enemies[i].rect.x > SCREEN_WIDTH - enemies[i].rect.width) {
@@ -145,7 +148,7 @@ void UpdateGame() {
             }
         }
 
-        // Si todos los enemigos están derrotados, cambiar al estado BOSS
+        // Si todos los enemigos estï¿½n derrotados, cambiar al estado BOSS
         if (allEnemiesDefeated && gameState == LEVEL1) {
             gameState = BOSS;
             bossActive = true; // Activar el Boss
@@ -201,7 +204,7 @@ void DrawGame() {
         if (enemyBullets[i].active) DrawRectangleRec(enemyBullets[i].rect, ORANGE);
     }
 
-    // Dibujar el Boss solo si está activo
+    // Dibujar el Boss solo si estï¿½ activo
     if (bossActive) {
         DrawRectangleRec(boss, DARKPURPLE);
         DrawText(TextFormat("Boss HP: %d", bossLife), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
