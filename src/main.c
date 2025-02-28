@@ -6,12 +6,12 @@
 
 
 #define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_HEIGHT 1000
 #define PLAYER_SPEED 5
-#define BULLET_SPEED 7
+#define BULLET_SPEED 10
 #define MAX_BULLETS 10
 #define MAX_ENEMIES 10
-#define ENEMY_BULLET_SPEED 4
+#define ENEMY_BULLET_SPEED 8
 #define MAX_ENEMY_BULLETS 5
 #define PLAYER_LIFE 3
 #define BOSS_LIFE 10
@@ -60,7 +60,9 @@ int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     SearchAndSetResourceDir("resources");
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
-    Texture Menu=LoadTexture("fonda galaga fabricas.png");
+    Image fondo = LoadImage("fonda galaga fabricas.png");
+    ImageResize(&fondo, fondo.width, fondo.height );
+    Texture Menu=LoadTextureFromImage(fondo);
     InitGame();
     SetTargetFPS(60);
 
@@ -68,7 +70,7 @@ int main(void) {
         UpdateGame();
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTexture(Menu, 800, 600, WHITE);
+        DrawTexture(Menu, 0, 0, WHITE);
         
         DrawGame();
         EndDrawing();
@@ -79,7 +81,8 @@ int main(void) {
 }
 
 void InitGame() {
-    player = (Rectangle){ SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT - 50, 40, 40 };
+    
+    player = (Rectangle){SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT - 50, 40, 40};
     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
     InitEnemies();
     boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
