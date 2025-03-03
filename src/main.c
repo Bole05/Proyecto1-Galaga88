@@ -12,7 +12,7 @@
 #define MAX_BULLETS 10
 #define MAX_ENEMIES 20//maximo enemigos que pueden estar en una vez
 #define ENEMY_BULLET_SPEED 8
-#define MAX_ENEMY_BULLETS 20//
+#define MAX_ENEMY_BULLETS 20// 
 #define PLAYER_LIFE 3
 #define BOSS_LIFE 10
 
@@ -42,6 +42,7 @@ void DrawGame();
 
 GameState gameState = MENU;
 Rectangle player;
+
 Bullet bullets[MAX_BULLETS];
 Enemy enemies[MAX_ENEMIES];
 EnemyBullet enemyBullets[MAX_ENEMY_BULLETS];
@@ -50,7 +51,7 @@ bool bossActive = false;
 int playerLife = PLAYER_LIFE;
 int bossLife = BOSS_LIFE;
 int score = 0;
-
+Texture2D playerTexture;
 void InitEnemies();
 void UpdateEnemies();
 void EnemyAttack();
@@ -65,6 +66,8 @@ int main(void) {
     Texture Menu=LoadTextureFromImage(fondo);
     InitGame();
     SetTargetFPS(60);
+
+
 
     while (!WindowShouldClose()) {
         UpdateGame();
@@ -81,12 +84,15 @@ int main(void) {
 }
 
 void InitGame() {
-    
     player = (Rectangle){SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT - 50, 40, 40};
     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
     InitEnemies();
     boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
     bossActive = false;
+    Image playerImagen = LoadImage("Player principal.png");
+    ImageResize(&playerImagen, 40, 40);
+    playerTexture = LoadTextureFromImage(playerImagen);
+    UnloadImage(playerImagen);
 }
 
 void InitEnemies() {
@@ -124,7 +130,7 @@ void UpdateGame() {
 
         UpdateEnemies();
         EnemyAttack();
-
+      
         // Activar el Boss si el estado es BOSS
         if (gameState == BOSS) {
             bossActive = true;
@@ -201,6 +207,7 @@ void UpdateBoss() {
     }
 }
 void DrawGame() {
+    DrawTexture(playerTexture, player.x, player.y, WHITE);
     DrawRectangleRec(player, BLUE);
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].active) DrawRectangleRec(bullets[i].rect, YELLOW);
@@ -211,7 +218,7 @@ void DrawGame() {
     for (int i = 0; i < MAX_ENEMY_BULLETS; i++) {
         if (enemyBullets[i].active) DrawRectangleRec(enemyBullets[i].rect, ORANGE);
     }
-
+   
     // Dibujar el Boss solo si est� activo
     if (bossActive) {
         DrawRectangleRec(boss, DARKPURPLE);
