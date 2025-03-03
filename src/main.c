@@ -5,14 +5,14 @@
 
 
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 1000
+#define SCREEN_WIDTH 610
+#define SCREEN_HEIGHT 1004
 #define PLAYER_SPEED 5
 #define BULLET_SPEED 10
 #define MAX_BULLETS 10
-#define MAX_ENEMIES 10
+#define MAX_ENEMIES 20//maximo enemigos que pueden estar en una vez
 #define ENEMY_BULLET_SPEED 8
-#define MAX_ENEMY_BULLETS 5
+#define MAX_ENEMY_BULLETS 20//
 #define PLAYER_LIFE 3
 #define BOSS_LIFE 10
 
@@ -61,7 +61,7 @@ int main(void) {
     SearchAndSetResourceDir("resources");
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
     Image fondo = LoadImage("fonda galaga fabricas.png");
-    ImageResize(&fondo, fondo.width, fondo.height );
+    ImageResize(&fondo, fondo.width*2.5, fondo.height*2 );
     Texture Menu=LoadTextureFromImage(fondo);
     InitGame();
     SetTargetFPS(60);
