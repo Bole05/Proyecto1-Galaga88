@@ -208,7 +208,7 @@ void UpdateBoss() {
 }
 void DrawGame() {
     DrawTexture(playerTexture, player.x, player.y, WHITE);
-    DrawRectangleRec(player, BLUE);
+    /*DrawRectangleRec(player, BLUE);*/
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].active) DrawRectangleRec(bullets[i].rect, YELLOW);
     }
