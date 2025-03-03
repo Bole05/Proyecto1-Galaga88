@@ -52,6 +52,7 @@ int playerLife = PLAYER_LIFE;
 int bossLife = BOSS_LIFE;
 int score = 0;
 Texture2D playerTexture;
+Texture2D enemiesTexture;
 void InitEnemies();
 void UpdateEnemies();
 void EnemyAttack();
@@ -89,10 +90,15 @@ void InitGame() {
     InitEnemies();
     boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
     bossActive = false;
-    Image playerImagen = LoadImage("player.png");
-    ImageResize(&playerImagen, 40, 40);
+    Image playerImagen = LoadImage("player-removebg-preview.png");
+    ImageResize(&playerImagen,40, 40);
     playerTexture = LoadTextureFromImage(playerImagen);
     UnloadImage(playerImagen);
+
+    Image enemiesImagen = LoadImage("player-removebg-preview.png");
+    ImageResize(&enemiesImagen, 40, 40);
+    enemiesTexture = LoadTextureFromImage(enemiesImagen);
+    UnloadImage(enemiesImagen);
 }
 
 void InitEnemies() {
@@ -213,7 +219,8 @@ void DrawGame() {
         if (bullets[i].active) DrawRectangleRec(bullets[i].rect, YELLOW);
     }
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (enemies[i].active) DrawRectangleRec(enemies[i].rect, RED);
+        if (enemies[i].active) DrawTexture(enemiesTexture, enemies[i].rect.x, enemies[i].rect.y, WHITE); ;
+        /*if (enemies[i].active) DrawRectangleRec(enemies[i].rect, RED);*/
     }
     for (int i = 0; i < MAX_ENEMY_BULLETS; i++) {
         if (enemyBullets[i].active) DrawRectangleRec(enemyBullets[i].rect, ORANGE);
