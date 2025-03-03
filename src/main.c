@@ -89,7 +89,7 @@ void InitGame() {
     InitEnemies();
     boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
     bossActive = false;
-    Image playerImagen = LoadImage("Player principal.png");
+    Image playerImagen = LoadImage("player.png");
     ImageResize(&playerImagen, 40, 40);
     playerTexture = LoadTextureFromImage(playerImagen);
     UnloadImage(playerImagen);
