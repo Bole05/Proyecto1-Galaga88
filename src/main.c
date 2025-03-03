@@ -95,7 +95,7 @@ void InitGame() {
     playerTexture = LoadTextureFromImage(playerImagen);
     UnloadImage(playerImagen);
 
-    Image enemiesImagen = LoadImage("player-removebg-preview.png");
+    Image enemiesImagen = LoadImage("fff.png");
     ImageResize(&enemiesImagen, 40, 40);
     enemiesTexture = LoadTextureFromImage(enemiesImagen);
     UnloadImage(enemiesImagen);
