@@ -15,6 +15,8 @@
 #define MAX_ENEMY_BULLETS 20// 
 #define PLAYER_LIFE 3
 #define BOSS_LIFE 10
+#define BOSS_BULLET_SPEED 12
+#define MAX_Boss_BULLETS 20//
 
 int enemySpeed = 2;
 
@@ -34,6 +36,11 @@ typedef struct {
     bool active;
 } EnemyBullet;
 
+typedef struct {
+    Rectangle rect;
+    bool active;
+} BossBullets;
+
 typedef enum { MENU, LEVEL1, LEVEL2, BOSS, GAMEOVER, WIN } GameState;
 
 void InitGame();
@@ -42,20 +49,24 @@ void DrawGame();
 
 GameState gameState = MENU;
 Rectangle player;
-
+Rectangle menu;
+Rectangle boss;
 Bullet bullets[MAX_BULLETS];
 Enemy enemies[MAX_ENEMIES];
 EnemyBullet enemyBullets[MAX_ENEMY_BULLETS];
-Rectangle boss;
+BossBullets bossBullets[MAX_Boss_BULLETS];
+
 bool bossActive = false;
 int playerLife = PLAYER_LIFE;
 int bossLife = BOSS_LIFE;
 int score = 0;
 Texture2D playerTexture;
 Texture2D enemiesTexture;
+Texture2D MenuTexture;
 void InitEnemies();
 void UpdateEnemies();
 void EnemyAttack();
+void BossAttack();
 void UpdateBoss();
 
 int main(void) {
@@ -88,9 +99,17 @@ void InitGame() {
     gameState = MENU; 
     player = (Rectangle){ SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT - 50, 40, 40 };
     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
+  
+    
+
     InitEnemies();
     boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
     bossActive = false;
+    Image Menuimagen = LoadImage("menu inicial.jpg");
+    ImageResize(&Menuimagen, SCREEN_WIDTH, SCREEN_HEIGHT);
+    MenuTexture = LoadTextureFromImage(Menuimagen);
+    UnloadImage(Menuimagen);
+
     Image playerImagen = LoadImage("player-removebg-preview.png");
     ImageResize(&playerImagen, 40, 40);
     playerTexture = LoadTextureFromImage(playerImagen);
@@ -100,6 +119,9 @@ void InitGame() {
     ImageResize(&enemiesImagen, 40, 40);
     enemiesTexture = LoadTextureFromImage(enemiesImagen);
     UnloadImage(enemiesImagen);
+    for (int i = 0; i < MAX_Boss_BULLETS; i++) {
+        bossBullets[i].active = false;
+    }
 }
 
 void InitEnemies() {
@@ -145,6 +167,7 @@ void UpdateGame() {
         if (gameState == BOSS) {
             bossActive = true;
             UpdateBoss();
+            BossAttack();
         }
     }
 }
@@ -216,10 +239,65 @@ void UpdateBoss() {
         }
     }
 }
+void BossAttack() {
+        for (int i = 0; i < MAX_Boss_BULLETS; i++) {
+            if (!bossBullets[i].active) {
+                // Disparar 3 balas en diferentes direcciones
+                bossBullets[i].rect = (Rectangle){
+                    boss.x + boss.width / 2 - 5,
+                    boss.y + boss.height,
+                    10, 20
+                };
+                bossBullets[i].active = true;
+
+                // Segunda bala (disparar hacia la izquierda)
+                if (i + 1 < MAX_Boss_BULLETS) {
+                    bossBullets[i + 1].rect = (Rectangle){
+                        boss.x + boss.width / 2 - 5,
+                        boss.y + boss.height,
+                        10, 20
+                    };
+                    bossBullets[i + 1].active = true;
+                }
+
+                // Tercera bala (disparar hacia la derecha)
+                if (i + 2 < MAX_Boss_BULLETS) {
+                    bossBullets[i + 2].rect = (Rectangle){
+                        boss.x + boss.width / 2 - 5,
+                        boss.y + boss.height,
+                        10, 20
+                    };
+                    bossBullets[i + 2].active = true;
+                }
+                break; // Salir del bucle después de generar las balas
+            }
+        }
+
+        // Mover las balas
+        for (int i = 0; i < MAX_Boss_BULLETS; i++) {
+            if (bossBullets[i].active) {
+                bossBullets[i].rect.y += BOSS_BULLET_SPEED; // Mover hacia abajo
+                if (bossBullets[i].rect.y > SCREEN_HEIGHT) {
+                    bossBullets[i].active = false;
+                }
+
+                if (CheckCollisionRecs(bossBullets[i].rect, player)) {
+                    playerLife--;
+                    bossBullets[i].active = false;
+                    if (playerLife <= 0) {
+                        gameState = GAMEOVER;
+                    }
+                }
+            }
+        }
+    }
+
 void DrawGame() {
     if (gameState == MENU) {
+        DrawTexture(MenuTexture, 0, 0, WHITE);
         // Dibujar el menú de inicio
         DrawText("GALAGA 88", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
+        
         DrawText("Presiona ENTER para comenzar", SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2, 20, WHITE);
     }
     else {
@@ -235,11 +313,19 @@ void DrawGame() {
         for (int i = 0; i < MAX_ENEMY_BULLETS; i++) {
             if (enemyBullets[i].active) DrawRectangleRec(enemyBullets[i].rect, ORANGE);
         }
+        for (int i = 0; i < MAX_Boss_BULLETS; i++) {
+            if (bossBullets[i].active) {
+                DrawRectangleRec(bossBullets[i].rect, PURPLE); // Dibujar las balas del boss
+            }
+        }
 
         // Dibujar el Boss solo si est� activo
         if (bossActive) {
             DrawRectangleRec(boss, DARKPURPLE);
             DrawText(TextFormat("Boss HP: %d", bossLife), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
+        }
+        if (playerLife == 0) {
+            DrawText("Game over", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
         }
 
         DrawText(TextFormat("Lives: %d", playerLife), 10, 10, 20, WHITE);
