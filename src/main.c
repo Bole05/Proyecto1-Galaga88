@@ -63,8 +63,8 @@ int main(void) {
     SearchAndSetResourceDir("resources");
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
     Image fondo = LoadImage("fonda galaga fabricas.png");
-    ImageResize(&fondo, fondo.width*2.5, fondo.height*2 );
-    Texture Menu=LoadTextureFromImage(fondo);
+    ImageResize(&fondo, fondo.width * 2.5, fondo.height * 2);
+    Texture Menu = LoadTextureFromImage(fondo);
     InitGame();
     SetTargetFPS(60);
 
@@ -75,7 +75,7 @@ int main(void) {
         BeginDrawing();
         ClearBackground(BLACK);
         DrawTexture(Menu, 0, 0, WHITE);
-        
+
         DrawGame();
         EndDrawing();
     }
@@ -85,13 +85,14 @@ int main(void) {
 }
 
 void InitGame() {
-    player = (Rectangle){SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT - 50, 40, 40};
+    gameState = MENU; 
+    player = (Rectangle){ SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT - 50, 40, 40 };
     for (int i = 0; i < MAX_BULLETS; i++) bullets[i].active = false;
     InitEnemies();
     boss = (Rectangle){ SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
     bossActive = false;
     Image playerImagen = LoadImage("player-removebg-preview.png");
-    ImageResize(&playerImagen,40, 40);
+    ImageResize(&playerImagen, 40, 40);
     playerTexture = LoadTextureFromImage(playerImagen);
     UnloadImage(playerImagen);
 
@@ -111,9 +112,12 @@ void InitEnemies() {
 }
 
 void UpdateGame() {
-    if (gameState == MENU && IsKeyPressed(KEY_ENTER)) gameState = LEVEL1;
-
-    if (gameState == LEVEL1 || gameState == LEVEL2 || gameState == BOSS) {
+    if (gameState == MENU) {
+        if (IsKeyPressed(KEY_ENTER)){
+            gameState = LEVEL1;
+        }
+    }
+    else if (gameState == LEVEL1 || gameState == LEVEL2 || gameState == BOSS) {
         if (IsKeyDown(KEY_LEFT) && player.x > 0) player.x -= PLAYER_SPEED;
         if (IsKeyDown(KEY_RIGHT) && player.x < SCREEN_WIDTH - player.width) player.x += PLAYER_SPEED;
 
@@ -213,25 +217,32 @@ void UpdateBoss() {
     }
 }
 void DrawGame() {
-    DrawTexture(playerTexture, player.x, player.y, WHITE);
-    /*DrawRectangleRec(player, BLUE);*/
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        if (bullets[i].active) DrawRectangleRec(bullets[i].rect, YELLOW);
+    if (gameState == MENU) {
+        // Dibujar el menú de inicio
+        DrawText("GALAGA 88", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
+        DrawText("Presiona ENTER para comenzar", SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2, 20, WHITE);
     }
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (enemies[i].active) DrawTexture(enemiesTexture, enemies[i].rect.x, enemies[i].rect.y, WHITE); ;
-        /*if (enemies[i].active) DrawRectangleRec(enemies[i].rect, RED);*/
-    }
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++) {
-        if (enemyBullets[i].active) DrawRectangleRec(enemyBullets[i].rect, ORANGE);
-    }
-   
-    // Dibujar el Boss solo si est� activo
-    if (bossActive) {
-        DrawRectangleRec(boss, DARKPURPLE);
-        DrawText(TextFormat("Boss HP: %d", bossLife), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
-    }
+    else {
+        DrawTexture(playerTexture, player.x, player.y, WHITE);
+        /*DrawRectangleRec(player, BLUE);*/
+        for (int i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].active) DrawRectangleRec(bullets[i].rect, YELLOW);
+        }
+        for (int i = 0; i < MAX_ENEMIES; i++) {
+            if (enemies[i].active) DrawTexture(enemiesTexture, enemies[i].rect.x, enemies[i].rect.y, WHITE); ;
+            /*if (enemies[i].active) DrawRectangleRec(enemies[i].rect, RED);*/
+        }
+        for (int i = 0; i < MAX_ENEMY_BULLETS; i++) {
+            if (enemyBullets[i].active) DrawRectangleRec(enemyBullets[i].rect, ORANGE);
+        }
 
-    DrawText(TextFormat("Lives: %d", playerLife), 10, 10, 20, WHITE);
-    DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
+        // Dibujar el Boss solo si est� activo
+        if (bossActive) {
+            DrawRectangleRec(boss, DARKPURPLE);
+            DrawText(TextFormat("Boss HP: %d", bossLife), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
+        }
+
+        DrawText(TextFormat("Lives: %d", playerLife), 10, 10, 20, WHITE);
+        DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
+    }
 }
