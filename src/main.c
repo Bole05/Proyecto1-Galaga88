@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <resource_dir.h>
-
-
-
 #define SCREEN_WIDTH 610
 #define SCREEN_HEIGHT 1004
 #define PLAYER_SPEED 5
