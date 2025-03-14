@@ -5,6 +5,7 @@
 #include<vector>
 #include<memory>
 #include"Player.h"
+<<<<<<< HEAD
 #include <iostream>
 using namespace std;
 
@@ -45,3 +46,6 @@ private:
 };
 
 #endif
+=======
+#include""
+>>>>>>> 66867cea5ad7606a8efe8525f7ec47ed92f0f18f
