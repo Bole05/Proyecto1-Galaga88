@@ -1,5 +1,5 @@
-#ifndef Enemy.h
-#define Enemy.h
+#ifndef Enemy_h
+#define Enemy_h
 
 #include "raylib.h"
 

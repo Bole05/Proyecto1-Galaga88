@@ -1,5 +1,5 @@
-#ifndef Bullet.H
-#define Bullet.H
+#ifndef Bullet_H
+#define Bullet_H
 
 #include "raylib.h"
 
