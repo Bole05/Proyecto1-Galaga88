@@ -5,10 +5,8 @@
 #include<vector>
 #include<memory>
 #include"Player.h"
-<<<<<<< HEAD
-#include <iostream>
-using namespace std;
 
+using namespace std;
 enum class GameState {MENU, LEVEL1, LEVEL2, BOSS, GAMEOVER, WIN };
 
 class Game{
@@ -16,8 +14,7 @@ class Game{
     const int SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 1000;
     const int MAX_ENEMIES = 10;
-
-     GameState gameState;
+    GameState gameState;
     Player player;
     vector<Enemy> enemies;
     vector<Bullet> playerBullets;
@@ -45,7 +42,4 @@ private:
 
 };
 
-#endif
-=======
-#include""
->>>>>>> 66867cea5ad7606a8efe8525f7ec47ed92f0f18f
+#endif GAME_H
