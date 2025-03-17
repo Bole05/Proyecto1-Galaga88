@@ -1,6 +1,5 @@
 #ifndef Bullet_H
 #define Bullet_H
-
 #include "raylib.h"
 
 class Bullet{
