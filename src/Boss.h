@@ -18,4 +18,4 @@ public:
 		return rect;
 	}
 };
-#endif //BOSS_H
+#endif 
