@@ -38,11 +38,9 @@ void Game::Run() {
 
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawTexture(menuBackground, 0, 0, WHITE);
-        Draw();
+        Draw(); 
         EndDrawing();
     }
-
     CloseWindow();
 }
 
@@ -87,9 +85,11 @@ void Game::Update() {
 }
 
 void Game::Draw() {
+   
+    if (gameState == GameState::MENU) {
+        DrawTexture(menuBackground, 0, 0, WHITE);
+    }
     player.Draw();
-
-
     for (const auto& bullet : playerBullets) {
         if (bullet.IsActive()) {
             bullet.Draw(YELLOW);
