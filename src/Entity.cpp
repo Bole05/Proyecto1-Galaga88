@@ -1,37 +1,35 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#include "Entity.h"
 
-#include "raylib.h"
-#include "RenderComponent.h"
+Entity::Entity(float x, float y, float width, float height) {
+    position = (Vector2){ x, y };
+    size = (Vector2){ width, height };
+    active = true;
+    renderer = nullptr;
+}
 
-class Entity {
-protected:
-    Vector2 position;
-    Vector2 size;
-    bool active;
-    RenderComponent* renderer;
-    
-public:
-    Entity(float x, float y, float width, float height);
-    virtual ~Entity();
-    
-    virtual void Update() = 0;
-    virtual void Draw();
-    
-    bool IsActive() const { return active; }
-    void SetActive(bool isActive) { active = isActive; }
-    
-    Rectangle GetRect() const;
-    bool CheckCollision(const Entity& other) const;
-    
-    // Getters and setters
-    Vector2 GetPosition() const { return position; }
-    void SetPosition(Vector2 newPos) { position = newPos; }
-    
-    Vector2 GetSize() const { return size; }
-    void SetSize(Vector2 newSize) { size = newSize; }
-    
-    void SetRenderer(RenderComponent* newRenderer);
-};
+Entity::~Entity() {
+    if (renderer) {
+        delete renderer;
+    }
+}
 
-#endif // ENTITY_H
+void Entity::Draw() {
+    if (active && renderer) {
+        renderer->Draw(position, size);
+    }
+}
+
+Rectangle Entity::GetRect() const {
+    return (Rectangle) { position.x, position.y, size.x, size.y };
+}
+
+bool Entity::CheckCollision(const Entity& other) const {
+    return CheckCollisionRecs(GetRect(), other.GetRect());
+}
+
+void Entity::SetRenderer(RenderComponent* newRenderer) {
+    if (renderer) {
+        delete renderer;
+    }
+    renderer = newRenderer;
+}

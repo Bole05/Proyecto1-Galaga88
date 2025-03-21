@@ -25,8 +25,8 @@ public:
     GameState CheckStateTransition() const override;
     
     // Helper methods
-    void SpawnEnemies();
-    void CheckCollisions();
+    //void SpawnEnemies();
+    //void CheckCollisions();
 };
 
 #endif // GAMEPLAY_SCENE_H

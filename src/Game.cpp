@@ -1,9 +1,9 @@
 #include "Game.h"
 #include "MenuScene.h"
 #include "GameplayScene.h"
-#include "BossScene.h"
-#include "GameOverScene.h"
-#include "WinScene.h"
+//#include "BossScene.h"
+//#include "GameOverScene.h"
+//#include "WinScene.h"
 #include <resource_dir.h>
 
 Game::Game(int width, int height, const char* title) {
