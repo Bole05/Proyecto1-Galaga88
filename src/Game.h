@@ -11,6 +11,12 @@
 #include "Globals.h"
 
 class Game {
+private:
+    ::GameState gameState;
+    Player* player;
+    std::vector<Enemy> enemies;
+    Boss* boss;
+    TileMap* tileMap;
 public:
     Game();
     ~Game();
@@ -18,12 +24,7 @@ public:
     void Update();
     void Draw();
     void Run();
-private:
-    GameState gameState;
-    Player* player;
-    std::vector<Enemy> enemies;
-    Boss* boss;
-    TileMap* tileMap;
+
 };
 
 #endif
