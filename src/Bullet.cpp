@@ -1,6 +1,7 @@
 #include "Bullet.h"
 #include "raylib.h"
 
+
 Bullet::Bullet() {
     rect = { 0, 0, 10, 20 };
 }

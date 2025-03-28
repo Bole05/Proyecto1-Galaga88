@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "Game.h"
+#include "Globals.h"
 
 int main() {
     int SCREEN_WIDTH = 1000;

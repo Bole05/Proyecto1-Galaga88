@@ -2,6 +2,7 @@
 #define SPRITE_H
 
 #include "raylib.h"
+#include "Globals.h"
 
 class Sprite {
 public:

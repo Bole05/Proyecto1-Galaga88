@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include "raylib.h"
+#include "Globals.h"
 
 class ResourceManager {
 public:

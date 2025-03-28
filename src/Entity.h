@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include "raylib.h"
+#include "Globals.h"
 
 class Entity {
 public:

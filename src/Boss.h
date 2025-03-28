@@ -2,6 +2,7 @@
 #define BOSS_H
 
 #include "Entity.h"
+#include "Globals.h"
 
 class Boss : public Entity {
 public:

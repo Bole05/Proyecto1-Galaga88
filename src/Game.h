@@ -8,6 +8,7 @@
 #include "Bullet.h"
 #include "TileMap.h"
 #include "ResourceManager.h"
+#include "Globals.h"
 
 class Game {
 public:

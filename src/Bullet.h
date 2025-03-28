@@ -1,5 +1,6 @@
 #ifndef BULLET_H
 #define BULLET_H
+#include "Globals.h"
 
 #include "Entity.h"
 
