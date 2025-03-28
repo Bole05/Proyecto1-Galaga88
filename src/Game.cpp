@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "raylib.h"
-
+#include "Globals.h"
 Game::Game() {
     gameState = MENU;
     player = new Player();

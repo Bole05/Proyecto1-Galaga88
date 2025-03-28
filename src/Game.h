@@ -1,6 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
-
+#include "Globals.h"
 #include "Scene.h"
 #include "Player.h"
 #include "Enemy.h"
@@ -8,11 +8,11 @@
 #include "Bullet.h"
 #include "TileMap.h"
 #include "ResourceManager.h"
-#include "Globals.h"
+
 
 class Game {
 private:
-    ::GameState gameState;
+    GameState gameState;
     Player* player;
     std::vector<Enemy> enemies;
     Boss* boss;
