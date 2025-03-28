@@ -1,8 +1,10 @@
 #include "TileMap.h"
 #include "raylib.h"
-
+#include <resource_dir.h>
 void TileMap::LoadMap() {
-    // Aquí puedes cargar un archivo de mapa o inicializarlo manualmente.
+    Image fondo = LoadImage("fonda galaga fabricas.png");
+    ImageResize(&fondo, fondo.width * 2.5, fondo.height * 2);
+    Texture Menu = LoadTextureFromImage(fondo);
 }
 
 void TileMap::DrawMap() {
