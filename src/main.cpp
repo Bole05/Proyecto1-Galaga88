@@ -2,6 +2,8 @@
 #include "Game.h"
 
 int main() {
+    int SCREEN_WIDTH = 1000;
+    int SCREEN_HEIGHT = 800;
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
 
