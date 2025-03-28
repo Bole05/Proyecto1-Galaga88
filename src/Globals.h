@@ -22,5 +22,5 @@
 #define BOSS_LIFE 10
 #define BOSS_BULLET_SPEED 12
 #define MAX_BOSS_BULLETS 20
-
+enum GameState { MENU, LEVEL1, LEVEL2, BOSS, GAMEOVER, WIN };
 #endif // GLOBALS_H

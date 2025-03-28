@@ -13,6 +13,7 @@ Enemy::Enemy() {
 
 void Enemy::Update() {
     rect.y += 2;
+ 
 }
 
 void Enemy::Draw() {

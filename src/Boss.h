@@ -7,6 +7,7 @@
 class Boss : public Entity {
 public:
     Boss();
+    void Init() override;
     void Update() override;
     void Draw() override;
 };
