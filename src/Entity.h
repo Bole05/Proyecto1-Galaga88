@@ -11,6 +11,9 @@ public:
     virtual void Draw() = 0;
     virtual ~Entity() {}
 
+    // Add this method to get the rectangle
+    Rectangle GetRect() const { return rect; }
+
 protected:
     Rectangle rect;
 };

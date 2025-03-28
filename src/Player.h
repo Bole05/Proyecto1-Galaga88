@@ -10,8 +10,13 @@ public:
     void Init() override;
     void Update() override;
     void Draw() override;
+
+    int GetLives() const { return lives; }
+    void TakeDamage() { lives--; }
+
 private:
     int lives;
+    Texture2D texture;
 };
 
 #endif

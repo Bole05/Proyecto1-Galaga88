@@ -1,8 +1,9 @@
 #include "Player.h"
 #include "raylib.h"
+#include "ResourceManager.h"
 
-Player::Player() {
-    lives = PLAYER_LIFE;
+Player::Player() : lives(PLAYER_LIFE) {
+    texture = ResourceManager::LoadTexture("player-removebg-preview.png");
 }
 
 void Player::Init() {
@@ -15,5 +16,5 @@ void Player::Update() {
 }
 
 void Player::Draw() {
-    DrawRectangleRec(rect, BLUE);
+    DrawTexture(texture, rect.x, rect.y, WHITE);
 }
