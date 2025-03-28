@@ -1,5 +1,6 @@
 #ifndef ENEMY_H
 #define ENEMY_H
+
 #include "Globals.h"
 #include "Entity.h"
 

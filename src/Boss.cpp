@@ -1,3 +1,5 @@
+#include <cstdlib> 
+#include <ctime> 
 #include "Boss.h"
 #include "raylib.h"
 
@@ -6,7 +8,7 @@ Boss::Boss() {
 }
 
 void Boss::Update() {
-    rect.x += (rand() % 2 == 0) ? 2 : -2; // Movimiento horizontal aleatorio
+    rect.x += (std::rand() % 2 == 0) ? 2 : -2; // Movimiento horizontal aleatorio
 }
 
 void Boss::Draw() {
