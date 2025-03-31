@@ -24,12 +24,8 @@ void Game::Init() {
 void Game::InitEnemies() {
     enemies.clear();
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        Enemy enemy;
-        Rectangle rect = enemy.GetRect();
-        rect.x = (i % 10) * (SCREEN_WIDTH / 10);
-        rect.y = -((i / 10) * 50);
-        enemy.Init();  // O usa un método SetPosition si lo tienes
-        enemies.push_back(enemy);
+        enemies.push_back(Enemy());  // Crea objetos directamente
+    
     }
 }
 
@@ -106,7 +102,7 @@ void Game::Update() {
         for (auto& bullet : playerBullets) bullet.Update();
 
         UpdateEnemies();
-        EnemyAttack();
+    /*    EnemyAttack();*/
 
         if (gameState == BOSS) {
             bossActive = true;
@@ -153,6 +149,12 @@ void Game::Draw() {
         DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
         DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
     }
-
     EndDrawing();
+
+    Game::~Game() {
+        for (Enemy* enemy : enemies) {
+            delete enemy;  // Libera cada enemigo de la memoria
+        }
+        enemies.clear();  // Opcional: limpia el vector
+    }
 }

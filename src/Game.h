@@ -32,6 +32,11 @@ private:
 
 public:
     Game();
+    ~Game() {
+        for (Enemy* enemy : enemies) {
+            delete enemy;  // Libera memoria al cerrar el juego
+        }
+    }
     void Init();
     void Update();
     void Draw();
