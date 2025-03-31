@@ -18,8 +18,8 @@ private:
     std::vector<Bullet> enemyBullets;
     std::vector<Bullet> bossBullets;
 
-    Texture2D menuTexture;
-    Texture2D backgroundTexture;
+    Texture2D menuTexture{};
+    Texture2D backgroundTexture{};
 
     int score;
     bool bossActive;

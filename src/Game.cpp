@@ -21,6 +21,67 @@ void Game::Init() {
     backgroundTexture = ResourceManager::LoadTexture("fonda galaga fabricas.png");
 }
 
+void Game::InitEnemies() {
+    enemies.clear();
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        Enemy enemy;
+        Rectangle rect = enemy.GetRect();
+        rect.x = (i % 10) * (SCREEN_WIDTH / 10);
+        rect.y = -((i / 10) * 50);
+        enemy.Init();  // O usa un método SetPosition si lo tienes
+        enemies.push_back(enemy);
+    }
+}
+
+void Game::UpdateEnemies() {
+    for (auto& enemy : enemies) {
+        enemy.Update();
+
+        // Eliminar enemigos que salgan de pantalla
+        if (enemy.GetRect().y > SCREEN_HEIGHT) {
+            enemy = Enemy(); // Reemplazar con nuevo enemigo
+        }
+    }
+}
+
+void Game::EnemyAttack() {
+    // Lógica para que los enemigos disparen
+    for (auto& enemy : enemies) {
+        if (GetRandomValue(0, 100) < 2) { // 2% de probabilidad por frame
+            for (auto& bullet : enemyBullets) {
+                if (!bullet.IsActive()) {
+                    Rectangle enemyRect = enemy.GetRect();
+                    bullet.Activate({ enemyRect.x + enemyRect.width / 2, enemyRect.y + enemyRect.height });
+                    break;
+                }
+            }
+        }
+    }
+
+    // Actualizar balas enemigas
+    for (auto& bullet : enemyBullets) {
+        bullet.Update();
+    }
+}
+
+void Game::BossAttack() {
+    // Lógica para que el boss dispare
+    if (GetRandomValue(0, 100) < 5) { // 5% de probabilidad por frame
+        for (auto& bullet : bossBullets) {
+            if (!bullet.IsActive()) {
+                Rectangle bossRect = boss.GetRect();
+                bullet.Activate({ bossRect.x + bossRect.width / 2, bossRect.y + bossRect.height });
+                break;
+            }
+        }
+    }
+
+    // Actualizar balas del boss
+    for (auto& bullet : bossBullets) {
+        bullet.Update();
+    }
+}
+
 void Game::Update() {
     if (gameState == MENU) {
         if (IsKeyPressed(KEY_ENTER)) {
@@ -51,6 +112,18 @@ void Game::Update() {
             bossActive = true;
             boss.Update();
             BossAttack();
+        }
+
+        for (auto& bullet : playerBullets) {
+            if (bullet.IsActive() && CheckCollisionRecs(bullet.GetRect(), boss.GetRect())) {
+                bullet.Deactivate();
+                boss.TakeDamage();
+                score += 50;
+
+                if (boss.GetLife() <= 0) {
+                    gameState = WIN;
+                }
+            }
         }
     }
 }
@@ -83,5 +156,3 @@ void Game::Draw() {
 
     EndDrawing();
 }
-
-// Implement other methods similarly...

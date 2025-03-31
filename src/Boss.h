@@ -13,10 +13,11 @@ public:
 
     // Añade estos métodos para manejar la vida del boss
     int GetLife() const { return life; }
-    void TakeDamage() { life--; }
+    void TakeDamage() {
+        if (life > 0) life--;
+    }
 
 private:
     int life;
 };
-
 #endif

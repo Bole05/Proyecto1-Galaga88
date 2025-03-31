@@ -4,11 +4,12 @@
 #include <ctime> 
 
 Boss::Boss() : life(BOSS_LIFE) {
-    Init();
+    rect = { SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
 }
 
 void Boss::Init() {
-    rect = { SCREEN_WIDTH / 2 - 60, 50, 120, 120 };
+    rect = { SCREEN_WIDTH / 2 - 50, 50, 100, 100 };
+    life = BOSS_LIFE;
 }
 
 void Boss::Update() {
