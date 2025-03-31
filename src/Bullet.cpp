@@ -1,27 +1,27 @@
+// Bullet.cpp
 #include "Bullet.h"
 #include "raylib.h"
 
-// Añade la implementación de Init()
+Bullet::Bullet() {
+    Init();
+}
+
 void Bullet::Init() {
-    // Puedes inicializar valores aquí si es necesario
     rect = { 0, 0, 10, 20 };
     active = false;
 }
 
-Bullet::Bullet() {
-    Init(); // Llama a Init() en el constructor
-}
-
-void Bullet::Activate(Vector2 position) {
-    rect.x = position.x;
-    rect.y = position.y;
+void Bullet::Activate(const Vector2& pos) {
+    rect.x = pos.x;
+    rect.y = pos.y;
     active = true;
 }
 
 void Bullet::Update() {
-    if (active) {
-        rect.y -= BULLET_SPEED;
-        if (rect.y < 0) active = false;
+    if (!active) return;
+    rect.y -= BULLET_SPEED;
+    if (rect.y < 0) {
+        active = false;
     }
 }
 

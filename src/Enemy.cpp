@@ -1,31 +1,37 @@
+// Enemy.cpp
 #include "Enemy.h"
 #include "raylib.h"
 #include <cstdlib>
 #include <ctime>
 
 Enemy::Enemy() {
-    Init();  // Llama a Init() en el constructor
+    Init();
 }
 
 void Enemy::Init() {
-    rect = {
-        static_cast<float>(rand() % (SCREEN_WIDTH - 40)),
-        static_cast<float>(-100),  // Aparecen arriba de la pantalla
-        40.0f,
-        40.0f
-    };
+    Reset();
+}
+
+void Enemy::Reset() {
+    rect.width = 40.0f;
+    rect.height = 40.0f;
+    rect.x = static_cast<float>(rand() % (SCREEN_WIDTH - 40));
+    rect.y = static_cast<float>(rand() % 200); // parte superior random
+
+    active = true;
+    direction = (rand() % 2) ? 1 : -1; // 1 o -1
 }
 
 void Enemy::Update() {
-    rect.y += 2;  // Movimiento hacia abajo
+    if (!active) return;
 
-    // Reiniciar posición si sale de pantalla
-    if (rect.y > SCREEN_HEIGHT) {
-        rect.y = -rect.height;
-        rect.x = static_cast<float>(rand() % (SCREEN_WIDTH - 40));
+    rect.x += direction * 2;  // velocidad horizontal
+    if (rect.x < 0 || rect.x > SCREEN_WIDTH - rect.width) {
+        direction *= -1;
     }
 }
 
 void Enemy::Draw() {
-    DrawRectangleRec(rect, RED);
+    if (!active) return;
+    DrawRectangleRec(rect, RED);  // Por defecto, un rectángulo rojo
 }

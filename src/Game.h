@@ -1,47 +1,48 @@
+// Game.h
 #ifndef GAME_H
 #define GAME_H
 
+#include <vector>
 #include "Globals.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Boss.h"
 #include "Bullet.h"
-#include <vector>
 
 class Game {
-private:
-    GameState gameState;
-    Player player;
-    std::vector<Enemy> enemies;
-    Boss boss;
-    std::vector<Bullet> playerBullets;
-    std::vector<Bullet> enemyBullets;
-    std::vector<Bullet> bossBullets;
-
-    Texture2D menuTexture{};
-    Texture2D backgroundTexture{};
-
-    int score;
-    bool bossActive;
-
-    void InitEnemies();
-    void UpdateEnemies();
-    void EnemyAttack();
-    void BossAttack();
-    void UpdateBoss();
-
 public:
     Game();
-    //~Game() {
-    //    for (Enemy* enemy : enemies) {
-    //        delete enemy;  // Libera memoria al cerrar el juego
-    //    }
-    //}
+    ~Game();
+
     void Init();
     void Update();
     void Draw();
-    void Run();
-    ~Game() = default;
+
+private:
+    void InitEnemies();
+    void UpdateEnemies();
+    void CheckAllEnemiesDefeated();
+    void EnemyAttack();
+    void BossAttack();
+
+    GameState gameState;
+
+    Player               player;
+    std::vector<Enemy>   enemies;
+    Boss                 boss;
+    std::vector<Bullet>  playerBullets;
+    std::vector<Bullet>  enemyBullets;
+    std::vector<Bullet>  bossBullets;
+
+    // Texturas
+    Texture2D menuTexture;
+    Texture2D backgroundTexture;
+    Texture2D playerTexture;
+    Texture2D enemyTexture;
+    Texture2D bossTexture; // Si tienes un PNG para el boss
+
+    int  score;
+    bool bossActive;
 };
 
 #endif

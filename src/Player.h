@@ -1,22 +1,23 @@
+// Player.h
 #ifndef PLAYER_H
 #define PLAYER_H
 
 #include "Entity.h"
-#include "Globals.h"
+#include "raylib.h"
 
 class Player : public Entity {
 public:
     Player();
-    void Init() override;
+    void Init()   override;
     void Update() override;
-    void Draw() override;
+    void Draw()   override;
 
-    int GetLives() const { return lives; }
+    int  GetLives() const { return lives; }
     void TakeDamage() { lives--; }
 
 private:
-    int lives;
-    Texture2D texture;
+    int       lives;
+    Texture2D texture; // Si usas texturas para dibujarlo
 };
 
-#endif                          
+#endif

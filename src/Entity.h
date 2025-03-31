@@ -1,3 +1,4 @@
+// Entity.h
 #ifndef ENTITY_H
 #define ENTITY_H
 
@@ -12,9 +13,10 @@ public:
     virtual ~Entity() {}
 
     Rectangle GetRect() const { return rect; }
+    void      SetRect(const Rectangle& r) { rect = r; }
 
 protected:
-    Rectangle rect{ 0, 0, 0, 0 };  
+    Rectangle rect{ 0, 0, 0, 0 };
 };
 
 #endif

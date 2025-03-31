@@ -1,23 +1,24 @@
+// Boss.h
 #ifndef BOSS_H
 #define BOSS_H
 
 #include "Entity.h"
-#include "Globals.h"
 
 class Boss : public Entity {
 public:
     Boss();
-    void Init() override;
+    void Init()   override;
     void Update() override;
-    void Draw() override;
+    void Draw()   override;
 
-    // Añade estos métodos para manejar la vida del boss
-    int GetLife() const { return life; }
-    void TakeDamage() {
-        if (life > 0) life--;
-    }
+    int  GetLife() const { return life; }
+    void TakeDamage(int amount) { life -= amount; }
+    bool IsActive() const { return active; }
+    void Activate(bool a) { active = a; }
 
 private:
-    int life;
+    int  life;
+    bool active;
 };
+
 #endif
