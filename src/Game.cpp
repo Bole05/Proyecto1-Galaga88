@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "raylib.h"
 #include "ResourceManager.h"
-
+#include"resource_dir.h"
 Game::Game() : gameState(MENU), score(0), bossActive(false) {
     playerBullets.resize(MAX_BULLETS);
     enemyBullets.resize(MAX_ENEMY_BULLETS);
@@ -19,8 +19,6 @@ void Game::Init() {
     //// Load textures
     menuTexture = ResourceManager::LoadTexture("menu inicial.jpg");
     backgroundTexture = ResourceManager::LoadTexture("fonda galaga fabricas.png");
-   /* menuTexture = ResourceManager::LoadTexture("C:/ruta_completa/menu_inicial.jpg");
-    backgroundTexture = ResourceManager::LoadTexture("C:/ruta_completa/fonda_galaga_fabricas.png");*/
     TraceLog(LOG_INFO, "Texturas comentadas - usando modo seguro");
 }
 
@@ -127,31 +125,36 @@ void Game::Update() {
 }
 
 void Game::Draw() {
-    BeginDrawing();
-    ClearBackground(BLACK);
+        BeginDrawing();
+        ClearBackground(BLACK);
 
-    if (gameState == MENU) {
-        DrawTexture(menuTexture, 0, 0, WHITE);
-        DrawText("GALAGA 88", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
-        DrawText("Presiona ENTER para comenzar", SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2, 20, WHITE);
-    }
-    else {
-        DrawTexture(backgroundTexture, 0, 0, WHITE);
-        player.Draw();
+        // Si estás en el menú principal
+        if (gameState == MENU) {
+            DrawTexture(menuTexture, 0, 0, WHITE);
+            DrawText("GALAGA 88", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
+            DrawText("Presiona ENTER para comenzar", SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2, 20, WHITE);
+        }
+        // Si ya entraste al juego (LEVEL1, LEVEL2, BOSS, etc.)
+        else {
+            // Para el fondo (en cualquier nivel que quieras ponerlo):
+            DrawTexture(backgroundTexture, 0, 0, WHITE);
 
-        for (auto& bullet : playerBullets) bullet.Draw();
-        for (auto& enemy : enemies) enemy.Draw();
-        for (auto& bullet : enemyBullets) bullet.Draw();
+            // Luego dibujas el resto de elementos (jugador, enemigos, balas, etc.)
+            player.Draw();
+            for (auto& bullet : playerBullets) bullet.Draw();
+            for (auto& enemy : enemies) enemy.Draw();
+            for (auto& bullet : enemyBullets) bullet.Draw();
 
-        if (bossActive) {
-            boss.Draw();
-            DrawText(TextFormat("Boss HP: %d", boss.GetLife()), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
+            if (bossActive) {
+                boss.Draw();
+                DrawText(TextFormat("Boss HP: %d", boss.GetLife()), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
+            }
+
+            DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
+            DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
         }
 
-        DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
-        DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
         EndDrawing();
-    }
- 
+    
 
 }
