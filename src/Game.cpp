@@ -14,6 +14,8 @@ Game::Game()
     , bossTexture{}
     , score(0)
     , bossActive(false)
+    , backgroundOffset(0.0f)
+    , backgroundSpeed(2.0f) 
 {
     playerBullets.resize(MAX_BULLETS);
     enemyBullets.resize(MAX_ENEMY_BULLETS);
@@ -38,20 +40,19 @@ void Game::Init() {
     srand((unsigned int)time(nullptr));
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
-    SetTargetFPS(60);
+    SetTargetFPS(90);
 
     // Cargar imágenes y texturas
     {
         // Menú
-        Image menuImg = LoadImage("menu_inicial.jpg");
+        Image menuImg = LoadImage("menu inicial.jpg");
         ImageResize(&menuImg, SCREEN_WIDTH, SCREEN_HEIGHT);
         menuTexture = LoadTextureFromImage(menuImg);
         UnloadImage(menuImg);
 
         // Fondo
-        Image bgImg = LoadImage("fonda_galaga_fabricas.png");
-        // Podrías redimensionar si quieres
-        // ImageResize(&bgImg, X, Y);
+        Image bgImg = LoadImage("fonda galaga fabricas.png");
+        ImageResize(&bgImg, SCREEN_WIDTH, SCREEN_HEIGHT);
         backgroundTexture = LoadTextureFromImage(bgImg);
         UnloadImage(bgImg);
 
@@ -92,7 +93,10 @@ void Game::Update() {
     if (WindowShouldClose()) {
         gameState = GAMEOVER;
     }
-
+    backgroundOffset += backgroundSpeed;
+    if (backgroundOffset >= backgroundTexture.height) {
+        backgroundOffset = 0.0f;
+    }
     switch (gameState) {
     case MENU:
         if (IsKeyPressed(KEY_ENTER)) {
@@ -243,14 +247,21 @@ void Game::Draw() {
     case LEVEL1:
     case LEVEL2:
     case BOSS:
-        // Fondo
+    {
+        // --- Fondo desplazándose ---
         if (backgroundTexture.id > 0) {
-            DrawTexture(backgroundTexture, 0, 0, WHITE);
+            int offsetY = (int)backgroundOffset;
+
+            // Dibuja la primera copia del fondo
+            DrawTexture(backgroundTexture, 0, offsetY, WHITE);
+
+            // Dibuja la segunda copia “encima” de la primera,
+            // para que se vea el efecto continuo
+            DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
         }
 
         // Jugador
         {
-            // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
             Rectangle pr = player.GetRect();
             DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
         }
@@ -264,7 +275,6 @@ void Game::Draw() {
         if (gameState != BOSS) {
             for (auto& e : enemies) {
                 if (e.IsActive()) {
-                    // Dibujar usando la textura enemyTexture
                     Rectangle er = e.GetRect();
                     DrawTexture(enemyTexture, (int)er.x, (int)er.y, WHITE);
                 }
@@ -300,6 +310,7 @@ void Game::Draw() {
             DrawText("GAME OVER", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
         }
         break;
+    }
 
     case GAMEOVER:
         DrawText("GAME OVER", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
@@ -315,8 +326,6 @@ void Game::Draw() {
     EndDrawing();
 }
 
-// -------------------------------------------------------------------
-// Métodos auxiliares privados:
 
 void Game::UpdateEnemies() {
     for (auto& e : enemies) {
