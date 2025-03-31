@@ -16,16 +16,18 @@ void Game::Init() {
     boss.Init();
     InitEnemies();
 
-    // Load textures
+    //// Load textures
     menuTexture = ResourceManager::LoadTexture("menu inicial.jpg");
     backgroundTexture = ResourceManager::LoadTexture("fonda galaga fabricas.png");
+   /* menuTexture = ResourceManager::LoadTexture("C:/ruta_completa/menu_inicial.jpg");
+    backgroundTexture = ResourceManager::LoadTexture("C:/ruta_completa/fonda_galaga_fabricas.png");*/
+    TraceLog(LOG_INFO, "Texturas comentadas - usando modo seguro");
 }
 
 void Game::InitEnemies() {
     enemies.clear();
     for (int i = 0; i < MAX_ENEMIES; i++) {
-        enemies.push_back(Enemy());  // Crea objetos directamente
-    
+        enemies.emplace_back();  // Crea enemigos directamente en el vector
     }
 }
 
@@ -148,13 +150,8 @@ void Game::Draw() {
 
         DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
         DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
+        EndDrawing();
     }
-    EndDrawing();
+ 
 
-    Game::~Game() {
-        for (Enemy* enemy : enemies) {
-            delete enemy;  // Libera cada enemigo de la memoria
-        }
-        enemies.clear();  // Opcional: limpia el vector
-    }
 }

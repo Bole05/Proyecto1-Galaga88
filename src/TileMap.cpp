@@ -2,9 +2,12 @@
 #include "raylib.h"
 #include <resource_dir.h>
 void TileMap::LoadMap() {
-    Image fondo = LoadImage("fonda galaga fabricas.png");
-    ImageResize(&fondo, fondo.width * 2.5, fondo.height * 2);
-    Texture Menu = LoadTextureFromImage(fondo);
+    if (FileExists("fonda galaga fabricas.png")) {
+        Image fondo = LoadImage("fonda galaga fabricas.png");
+        ImageResize(&fondo, SCREEN_WIDTH, SCREEN_HEIGHT);  // Redimensiona al tamaño de pantalla
+        Texture Menu = LoadTextureFromImage(fondo);
+        UnloadImage(fondo);  // ¡Libera la imagen después de usarla!
+    }
 }
 
 void TileMap::DrawMap() {
