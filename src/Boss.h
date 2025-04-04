@@ -15,10 +15,12 @@ public:
     void TakeDamage(int amount) { life -= amount; }
     bool IsActive() const { return active; }
     void Activate(bool a) { active = a; }
-
+    void SetTexture(Texture2D tex) { texture = tex; }
 private:
     int  life;
     bool active;
+    float speedX;
+    Texture2D texture;
 };
 
 #endif

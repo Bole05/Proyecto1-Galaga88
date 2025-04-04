@@ -3,7 +3,7 @@
 #include "raylib.h"
 #include <cstdlib>
 #include <ctime>
-#include <resource_dir.h> // Para SearchAndSetResourceDir
+#include <resource_dir.h> 
 
 Game::Game()
     : gameState(MENU)
@@ -23,7 +23,7 @@ Game::Game()
 }
 
 Game::~Game() {
-    // Liberar texturas si quieres
+ 
     UnloadTexture(menuTexture);
     UnloadTexture(backgroundTexture);
     UnloadTexture(playerTexture);
@@ -34,7 +34,7 @@ Game::~Game() {
 }
 
 void Game::Init() {
-    // Cambiamos el directorio de recursos
+   
     SearchAndSetResourceDir("resources");
 
     srand((unsigned int)time(nullptr));
@@ -42,7 +42,7 @@ void Game::Init() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
     SetTargetFPS(90);
 
-    // Cargar imágenes y texturas
+   
     {
         // Menú
         Image menuImg = LoadImage("menu inicial.jpg");
@@ -68,10 +68,12 @@ void Game::Init() {
         enemyTexture = LoadTextureFromImage(enemyImg);
         UnloadImage(enemyImg);
 
-        // Boss (si tienes)
-        // Image bossImg = LoadImage("boss.png");
-        // bossTexture = LoadTextureFromImage(bossImg);
-        // UnloadImage(bossImg);
+         //Boss
+         Image bossImg = LoadImage("Galaga_'88_king_D2.png");
+         ImageResize(&bossImg, 100, 100);
+         bossTexture = LoadTextureFromImage(bossImg);
+         UnloadImage(bossImg);
+         boss.SetTexture(bossTexture);
     }
 
     // Inicializamos nuestras entidades
@@ -167,6 +169,7 @@ void Game::Update() {
     case BOSS: {
         // Player
         player.Update();
+        boss.Update();
         if (IsKeyPressed(KEY_SPACE)) {
             for (auto& pb : playerBullets) {
                 if (!pb.IsActive()) {
@@ -291,6 +294,8 @@ void Game::Draw() {
         // Boss
         if (bossActive && boss.IsActive()) {
             boss.Draw();
+            /*Rectangle br = boss.GetRect();
+            DrawTexture(bossTexture, (int)br.x, (int)br.y, WHITE);*/
             DrawText(TextFormat("Boss HP: %d", boss.GetLife()), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
         }
 
