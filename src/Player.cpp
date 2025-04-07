@@ -5,7 +5,15 @@
 
 Player::Player()
     : lives(PLAYER_LIFE)
-    , spriteSheet{} 
+    , spriteSheet{}          // Inicializa la textura en blanco
+    , state(PlayerState::IDLE)
+    , currentFrame(0)
+    , framesPerRow(0)
+    , totalRows(0)
+    , frameTime(0.1f)
+    , timer(0.0f)
+    , frameWidth(0)
+    , frameHeight(0)
 {
   
 }
@@ -13,29 +21,17 @@ Player::Player()
 void Player::Init() {
     lives = PLAYER_LIFE;
    
-        // Ejemplo: 
-        // Cargar la imagen (puede que lo hagas en Game y luego setees en Player)
-        Image sheet = LoadImage("Arcade - Galaga 88 - Fighter.png");
-        // Podrías redimensionar si quieres que cada frame sea un tamaño exacto
-        // ImageResize(&sheet, algo, algo);
-        spriteSheet = LoadTextureFromImage(sheet);
-        UnloadImage(sheet);
+    rect = { SCREEN_WIDTH / 2.0f - 16, SCREEN_HEIGHT - 32, 32, 32 };
 
-        // Ajusta tu rect para la posición
-        rect = { SCREEN_WIDTH / 2.0f - 16, SCREEN_HEIGHT - 32, 32, 32 };
-
-        // Suponiendo que la hoja tiene 8 frames en horizontal y 2 filas (16 frames total)
-        framesPerRow = 8;
-        totalRows = 2;
-        frameWidth = spriteSheet.width / framesPerRow;  // p. ej. 32
-        frameHeight = spriteSheet.height / totalRows;     // p. ej. 32
-
-        currentFrame = 0;
-        frameTime = 0.1f;  // cambiar de frame cada 0.1 seg
-        timer = 0.0f;
-
-        // Estado inicial
-        state = PlayerState::IDLE;
+    // Configura la animación, asumiendo que ya tienes spriteSheet.
+    framesPerRow = 8;    // hipotético
+    totalRows = 2;    // hipotético
+    frameWidth = spriteSheet.width / framesPerRow;
+    frameHeight = spriteSheet.height / totalRows;
+    currentFrame = 0;
+    frameTime = 0.1f;
+    timer = 0.0f;
+    state = PlayerState::IDLE;
     
 
 
@@ -81,18 +77,27 @@ void Player::Update() {
 }
 AnimationSegment Player::GetSegmentForState(PlayerState st) {
     switch (st) {
-    case PlayerState::IDLE:
-        return { 0, 0, 3 };   // Ejemplo fila 0, frames 0-3
-    case PlayerState::MOVE:
-        return { 0, 4, 7 };   // fila 0, frames 4-7
-    case PlayerState::SHOOT:
-        return { 1, 0, 3 };   // fila 1, frames 0-3
-    case PlayerState::HURT:
-        return { 1, 4, 7 };   // fila 1, frames 4-7
+    case PlayerState::IDLE: {
+        AnimationSegment seg = { 0, 0, 3 };  // Fila 0, frames 0 a 3
+        return seg;
+    }
+    case PlayerState::MOVE: {
+        AnimationSegment seg = { 0, 4, 7 };  // Fila 0, frames 4 a 7
+        return seg;
+    }
+    case PlayerState::SHOOT: {
+        AnimationSegment seg = { 1, 0, 3 };  // Fila 1, frames 0 a 3
+        return seg;
+    }
+    case PlayerState::HURT: {
+        AnimationSegment seg = { 1, 4, 7 };  // Fila 1, frames 4 a 7
+        return seg;
+    }
     default:
         return { 0, 0, 0 };
     }
 }
+
 void Player::Draw() {
     // 1) Consulta la segmentación
     AnimationSegment seg = GetSegmentForState(state);

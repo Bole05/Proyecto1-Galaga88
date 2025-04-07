@@ -18,10 +18,9 @@ struct AnimationSegment {
     int endFrame;
 };
 
-AnimationSegment idleAnim = { 0, 0, 3 }; // fila 0, frames 0..3
-AnimationSegment moveAnim = { 0, 4, 7 }; // fila 0, frames 4..7
-AnimationSegment shootAnim = { 1, 0, 3 }; // fila 1, frames 0..3
-// etc.
+inline AnimationSegment idleAnim = { 0, 0, 3 }; // fila 0, frames 0..3
+inline AnimationSegment moveAnim = { 0, 4, 7 }; // fila 0, frames 4..7
+inline AnimationSegment shootAnim = { 1, 0, 3 }; // fila 1, frames 0..3
 
 class Player : public Entity {
 public:
@@ -29,7 +28,7 @@ public:
     void Init()   override;
     void Update() override;
     void Draw()   override;
-
+    void SetTexture(Texture2D tex) { spriteSheet = tex; }
     int  GetLives() const { return lives; }
     void TakeDamage() { lives--; }
 
