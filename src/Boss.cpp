@@ -47,21 +47,7 @@ void Boss::SetTexture(Texture2D tex) {
     frameHeight = spriteSheet.height / rows; // ~ 319/4 = ~79
 }
 void Boss::Update() {
- //   if (!active) return;
- //   rect.x += speedX;
- ///*   static int bossSpeed = 2;
- //   rect.x += bossSpeed;
- //   if (rect.x < 0 || (rect.x + rect.width) > SCREEN_WIDTH) {
- //       bossSpeed *= -1;
- //   }*/
- //   if (rect.x < 0) {
- //       rect.x = 0;
- //       speedX = -speedX; // Invertir dirección
- //   }
- //   else if (rect.x + rect.width > SCREEN_WIDTH) {
- //       rect.x = SCREEN_WIDTH - rect.width;
- //       speedX = -speedX; // Invertir dirección
- //   }
+
     if (!active) return;
 
     // Movimiento horizontal de ejemplo
