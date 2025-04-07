@@ -69,7 +69,7 @@ void Game::Init() {
         UnloadImage(enemyImg);
 
          //Boss
-         Image bossImg = LoadImage("Galaga_'88_king_D2.png");
+         Image bossImg = LoadImage("Arcade_-_Galaga_Arrangement_-_King_Galaspark-removebg-preview.png");
          ImageResize(&bossImg, 100, 100);
          bossTexture = LoadTextureFromImage(bossImg);
          UnloadImage(bossImg);
@@ -92,6 +92,7 @@ void Game::InitEnemies() {
 }
 
 void Game::Update() {
+    float delta = GetFrameTime();
     if (WindowShouldClose()) {
         gameState = GAMEOVER;
     }
@@ -165,11 +166,13 @@ void Game::Update() {
             boss.Activate(true);
         }
         break;
-
+    
     case BOSS: {
-        // Player
         player.Update();
+
         boss.Update();
+        //player.Update();
+        //boss.Update();
         if (IsKeyPressed(KEY_SPACE)) {
             for (auto& pb : playerBullets) {
                 if (!pb.IsActive()) {
