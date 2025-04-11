@@ -40,7 +40,7 @@ private:
     Texture2D playerTexture;
     Texture2D enemyTexture;
     Texture2D bossTexture; // Si tienes un PNG para el boss
-
+    Texture2D PlyBulletText;
     int  score;
     bool bossActive;
     float backgroundOffset; // Cuánto se ha desplazado la textura

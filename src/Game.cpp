@@ -12,6 +12,7 @@ Game::Game()
     , playerTexture{}
     , enemyTexture{}
     , bossTexture{}
+    , PlyBulletText{}
     , score(0)
     , bossActive(false)
     , backgroundOffset(0.0f)
@@ -29,6 +30,7 @@ Game::~Game() {
     UnloadTexture(playerTexture);
     UnloadTexture(enemyTexture);
     UnloadTexture(bossTexture);
+    UnloadTexture(PlyBulletText);
 
     CloseWindow();
 }
@@ -77,7 +79,10 @@ void Game::Init() {
          UnloadImage(bossImg);
          boss.SetTexture(bossTexture);
 
-
+         //bullet Player
+         Image playerBulletImg = LoadImage("Galaga88_Sprite_Ampliado-removebg-preview.png");
+         PlyBulletText = LoadTextureFromImage(playerBulletImg);
+         UnloadImage(playerBulletImg);
     }
 
     // Inicializamos nuestras entidades
