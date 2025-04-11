@@ -57,12 +57,13 @@ void Game::Init() {
         UnloadImage(bgImg);
 
         // Player
-        Image playerImg = LoadImage("Arcade - Galaga 88 - Fighter.png");
-        ImageResize(&playerImg, 256, 64);
-        Texture2D playerTex = LoadTextureFromImage(playerImg);
+        Image playerImg = LoadImage("99809.png");
+        // Por si quieres redimensionar a 40x40
+        ImageResize(&playerImg, 75, 75);
+        playerTexture = LoadTextureFromImage(playerImg);
         UnloadImage(playerImg);
-        player.SetTexture(playerTex);
-        player.Init();//
+       
+        
         // Enemy
         Image enemyImg = LoadImage("fff.png");
         ImageResize(&enemyImg, 40, 40);
@@ -251,19 +252,23 @@ void Game::Draw() {
         }
         DrawText("GALAGA 88", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
         DrawText("Press ENTER to start", SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2, 20, WHITE);
-        break; // <-- Importante
+        break; 
 
     case LEVEL1:
     {
-        // --- Dibujar el fondo con scroll ---
+    
         if (backgroundTexture.id > 0) {
             int offsetY = (int)backgroundOffset;
             DrawTexture(backgroundTexture, 0, offsetY, WHITE);
             DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
         }
-
-        // Dibujar el Player (usa Player::Draw(), que maneja la animación)
-        player.Draw();
+        {
+            // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
+            Rectangle pr = player.GetRect();
+            DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
+        }
+        
+        
 
         // Balas del Player
         for (auto& pb : playerBullets) {
@@ -297,16 +302,19 @@ void Game::Draw() {
 
     case LEVEL2:
     {
-        // (Si quieres la misma lógica que LEVEL1, repite;
-        // o cambia lo que necesites.)
+        
 
         if (backgroundTexture.id > 0) {
             int offsetY = (int)backgroundOffset;
             DrawTexture(backgroundTexture, 0, offsetY, WHITE);
             DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
         }
-
-        player.Draw();
+        {
+            // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
+            Rectangle pr = player.GetRect();
+            DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
+        }
+        
 
         for (auto& pb : playerBullets) {
             pb.Draw();
@@ -341,10 +349,13 @@ void Game::Draw() {
             DrawTexture(backgroundTexture, 0, offsetY, WHITE);
             DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
         }
-
-        // Jugador
-        player.Draw();
-
+        {
+            // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
+            Rectangle pr = player.GetRect();
+            DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
+        }
+     
+    
         // Balas del Player
         for (auto& pb : playerBullets) {
             pb.Draw();
