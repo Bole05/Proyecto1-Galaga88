@@ -58,6 +58,14 @@ void Game::Init() {
         backgroundTexture = LoadTextureFromImage(bgImg);
         UnloadImage(bgImg);
 
+        Image bossBgImg = LoadImage("NIVELL_BOSS_1.png");
+        ImageResize(&bossBgImg, SCREEN_WIDTH, SCREEN_HEIGHT);
+        bossBackgroundTexture = LoadTextureFromImage(bossBgImg);
+        UnloadImage(bossBgImg);
+        bgTransitionActive = false;
+        bgAlpha = 0.0f;   // parte transparente
+        bgFadeSpeed = 0.02f;
+
         // Player
         Image playerImg = LoadImage("99809.png");
         // Por si quieres redimensionar a 40x40
@@ -116,6 +124,13 @@ void Game::Update() {
     if (backgroundOffset >= backgroundTexture.height) {
         backgroundOffset = 0.0f;
     }
+    if (bgTransitionActive) {
+        bgAlpha += bgFadeSpeed;
+        if (bgAlpha >= 1.0f) {      // cuando llega a opacidad total…
+            bgAlpha = 1.0f;
+            bgTransitionActive = false;
+           }
+}
     switch (gameState) {
     case MENU:
         if (IsKeyPressed(KEY_ENTER)) {
@@ -175,7 +190,6 @@ void Game::Update() {
 
         // Si matamos a todos -> Boss
         CheckAllEnemiesDefeated();
-
         if (gameState == BOSS) {
             bossActive = true;
             boss.Init();
@@ -256,6 +270,15 @@ void Game::Update() {
 void Game::Draw() {
     BeginDrawing();
     ClearBackground(BLACK);
+    // Fondo normal (o versión con scroll si la tienes)
+    DrawTexture(backgroundTexture, 0, 0, WHITE);
+
+    // Si estamos en BOSS o hay fundido activo, dibuja el nuevo fondo encima
+    if (gameState == BOSS || bgTransitionActive) {
+        Color tint = WHITE;
+        tint.a = (unsigned char)(bgAlpha * 255);   // 0-255 según progreso
+        DrawTexture(bossBackgroundTexture, 0, 0, tint);
+    }
 
     switch (gameState) {
     case MENU:
@@ -439,18 +462,26 @@ void Game::UpdateEnemies() {
 }
 
 void Game::CheckAllEnemiesDefeated() {
-    bool allDead = true;
-    for (auto& e : enemies) {
-        if (e.IsActive()) {
-            allDead = false;
-            break;
+        bool allDead = true;
+        for (auto& e : enemies) {
+            if (e.IsActive()) {
+                allDead = false;
+                break;
+            }
+        }
+        if (allDead && gameState == LEVEL1) {
+            /*----------------------------------------------------
+              1) Cambiamos de nivel                                     */
+            gameState = BOSS;
+            bossActive = true;      // si ya lo usas para el Boss
+
+            /*----------------------------------------------------
+              2) Iniciamos la transición del fondo-Boss            */
+            bgTransitionActive = true;   // ? empieza el fundido
+            bgAlpha = 0.0f;   // ? nuevo fondo parte invisible
         }
     }
 
-    if (allDead && gameState == LEVEL1) {
-        gameState = BOSS;
-    }
-}
 
 void Game::EnemyAttack() {
     // Pequeña probabilidad de disparo

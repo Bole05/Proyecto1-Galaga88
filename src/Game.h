@@ -37,6 +37,8 @@ private:
     // Texturas
     Texture2D menuTexture;
     Texture2D backgroundTexture;
+    Texture2D bossBackgroundTexture;  // ? añadir
+  
     Texture2D playerTexture;
     Texture2D enemyTexture;
     Texture2D bossTexture; // Si tienes un PNG para el boss
@@ -45,6 +47,11 @@ private:
     bool bossActive;
     float backgroundOffset; // Cuánto se ha desplazado la textura
     float backgroundSpeed;  // Velocidad de desplazamiento
+  
+
+    bool  bgTransitionActive;
+    float bgAlpha;
+    float bgFadeSpeed;
 };
 
 #endif
