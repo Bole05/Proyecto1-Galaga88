@@ -80,9 +80,16 @@ void Game::Init() {
          boss.SetTexture(bossTexture);
 
          //bullet Player
-         Image playerBulletImg = LoadImage("Galaga88_Sprite_Ampliado-removebg-preview.png");
-         PlyBulletText = LoadTextureFromImage(playerBulletImg);
-         UnloadImage(playerBulletImg);
+    
+         Image pBulletImg = LoadImage("Galaga88_Sprite_Ampliado-removebg-preview.png");
+         ImageResize(&pBulletImg, 46, 40);              // tamaño final de la bala
+         Texture2D playerBulletTex = LoadTextureFromImage(pBulletImg);
+         UnloadImage(pBulletImg);
+
+         // la misma textura para todas las balas del jugador
+         for (auto& b : playerBullets)  
+             b.SetTexture(playerBulletTex);
+
     }
 
     // Inicializamos nuestras entidades

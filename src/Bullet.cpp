@@ -2,13 +2,14 @@
 #include "Bullet.h"
 #include "raylib.h"
 
-Bullet::Bullet() {
-    Init();
+Bullet::Bullet()
+    : active(false)
+    , bulletTexture{}           
+{
+    rect = { 0,0,10,20 };     
 }
 
 void Bullet::Init() {
-    rect = { 0, 0, 10, 20 };
-    active = false;
 }
 
 void Bullet::Activate(const Vector2& pos) {
@@ -26,7 +27,12 @@ void Bullet::Update() {
 }
 
 void Bullet::Draw() {
-    if (active) {
+    if (!active) return;
+
+    if (bulletTexture.id != 0) { 
+        DrawTexture(bulletTexture, (int)rect.x, (int)rect.y, WHITE);
+    }
+    else {                  
         DrawRectangleRec(rect, YELLOW);
     }
 }

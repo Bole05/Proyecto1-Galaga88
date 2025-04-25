@@ -14,9 +14,10 @@ public:
     bool IsActive() const { return active; }
     void Activate(const Vector2& pos);
     void Deactivate() { active = false; }
-
+    void SetTexture(Texture2D tex) { bulletTexture = tex; }
 private:
     bool active;
+    Texture2D bulletTexture{};
 };
 
 #endif
