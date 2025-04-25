@@ -45,6 +45,7 @@ private:
     Texture2D PlyBulletText;
     int  score;
     bool bossActive;
+  
     float backgroundOffset; // Cuánto se ha desplazado la textura
     float backgroundSpeed;  // Velocidad de desplazamiento
   
