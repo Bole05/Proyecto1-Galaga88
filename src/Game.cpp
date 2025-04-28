@@ -114,13 +114,11 @@ void Game::Init() {
 
     }
 
-    // Inicializamos nuestras entidades
     player.Init();
     boss.Init();
     InitEnemies();
 }
 
-// Crea una tanda de enemigos
 void Game::InitEnemies() {
     enemies.clear();
     enemies.resize(MAX_ENEMIES);
@@ -422,14 +420,14 @@ void Game::CheckAllEnemiesDefeated() {
         }
     }
 
-    /* ??? Cuando no queda ningún enemigo vivo ??? */
+    
     if (allDead && (gameState == LEVEL1 || gameState == LEVEL2)) {
-        gameState = BOSS;   // pasamos a la fase Boss
-        bossActive = true;   // se dibuja / actualiza el jefe
+        gameState = BOSS;   
+        bossActive = true;   
 
-        /* ??  Inicia el fundido de fondo  ????????? */
-        bgTransitionActive = true;   // activa la lógica de alpha
-        bgAlpha = 0.0f;   // nuevo fondo arranca invisible
+      
+        bgTransitionActive = true;  
+        bgAlpha = 0.0f;   
     }
 }
 
@@ -437,7 +435,7 @@ void Game::EnemyAttack() {
     for (auto& e : enemies) {
         if (!e.IsActive()) continue;
 
-        if (GetRandomValue(0, 100) < 3) {  //100      // 2 % por enemigo
+        if (GetRandomValue(0, 100) < 3) {  
             for (auto& eb : enemyBullets) {
                 if (!eb.IsActive()) {
                     Rectangle er = e.GetRect();
