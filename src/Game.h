@@ -53,6 +53,9 @@ private:
     bool  bgTransitionActive;
     float bgAlpha;
     float bgFadeSpeed;
+    float bossBgOffset = 0.0f;
+    float bossBgSpeed = 1.5f;
+    int   bestScore = 0;
 };
 
 #endif

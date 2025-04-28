@@ -9,19 +9,27 @@ Game::Game()
     : gameState(MENU)
     , menuTexture{}
     , backgroundTexture{}
+    , bossBackgroundTexture{}
     , playerTexture{}
     , enemyTexture{}
     , bossTexture{}
     , PlyBulletText{}
     , score(0)
+    , bestScore(0)
     , bossActive(false)
     , backgroundOffset(0.0f)
-    , backgroundSpeed(2.0f) 
+    , backgroundSpeed(2.0f)
+    , bgTransitionActive(false)
+    , bgAlpha(0.0f)
+    , bgFadeSpeed(0.05f)
+    , bossBgOffset(0.0f)
+    , bossBgSpeed(1.5f)
 {
     playerBullets.resize(MAX_BULLETS);
     enemyBullets.resize(MAX_ENEMY_BULLETS);
     bossBullets.resize(MAX_BOSS_BULLETS);
 }
+
 
 Game::~Game() {
  
@@ -69,6 +77,8 @@ void Game::Init() {
         bgTransitionActive = false;
         bgAlpha = 0.0f;   // opacidad inicial
         bgFadeSpeed = 0.05f;
+        bossBgOffset = 0.0f;
+        bossBgSpeed = 1.5f;
 
         // Player
         Image playerImg = LoadImage("99809.png");
@@ -128,13 +138,8 @@ void Game::Update() {
     if (backgroundOffset >= backgroundTexture.height) {
         backgroundOffset = 0.0f;
     }
-    if (bgTransitionActive) {
-        bgAlpha += bgFadeSpeed;
-        if (bgAlpha >= 1.0f) {      // cuando llega a opacidad total…
-            bgAlpha = 1.0f;
-            bgTransitionActive = false;
-           }
-}
+
+
     switch (gameState) {
     case MENU:
         if (IsKeyPressed(KEY_ENTER)) {
@@ -269,190 +274,109 @@ void Game::Update() {
         }
         break;
     }
+
+    if (bgTransitionActive) {
+        bgAlpha += bgFadeSpeed;
+        if (bgAlpha >= 1.0f) {      // cuando llega a opacidad total…
+            bgAlpha = 1.0f;
+            bgTransitionActive = false;
+        }
+        /* ?? scroll del fondo-Boss ????????????????????????????? */
+        if (gameState == BOSS || bgTransitionActive)
+        {
+            bossBgOffset += bossBgSpeed;
+            if (bossBgOffset >= bossBackgroundTexture.height)
+                bossBgOffset = 0.0f;
+        }
+
+        /* ?? guardar récord cuando termina la partida ????????? */
+        if ((gameState == GAMEOVER || gameState == WIN) && score > bestScore)
+            bestScore = score;
+    }
+    if (bgTransitionActive) {
+        bgAlpha += bgFadeSpeed;              // sube opacidad
+        if (bgAlpha >= 0.80f) {              // llega al 80 % máx
+            bgAlpha = 0.80f;                 // (ajusta si quieres 1.0f)
+            bgTransitionActive = false;      // fundido terminado
+        }
+    }
+
+    /*????????????????  SCROLL DEL FONDO-BOSS  ???????????*/
+    if (gameState == BOSS || bgTransitionActive) {
+        bossBgOffset += bossBgSpeed;                         // mueve
+        if (bossBgOffset >= bossBackgroundTexture.height)    // reinicia
+            bossBgOffset = 0.0f;
+    }
+
+    /*????????????????  RÉCORD DE PUNTUACIÓN  ?????????????*/
+    if ((gameState == GAMEOVER || gameState == WIN) && score > bestScore)
+        bestScore = score;
+
 }
 
-void Game::Draw() {
+void Game::Draw()
+{
     BeginDrawing();
     ClearBackground(BLACK);
-    switch (gameState) {
+
+    /*???????????????? 1) FONDO NORMAL con scroll (solo si procede) ?????????????*/
+    bool mostrarFondoNormal = (gameState != BOSS) || bgTransitionActive;
+
+    if (mostrarFondoNormal) {
+        int yScroll = (int)backgroundOffset % backgroundTexture.height;
+        DrawTexture(backgroundTexture, 0, yScroll, WHITE);
+        DrawTexture(backgroundTexture, 0,
+            yScroll - backgroundTexture.height, WHITE);
+    }
+
+    /*???????????????? 2) FONDO-BOSS con scroll propio + alfa ???????????????????*/
+    if (gameState == BOSS || bgTransitionActive) {
+        Color tint = WHITE;
+        tint.a = (unsigned char)(bgAlpha * 255);   // 0–255
+        int by = (int)bossBgOffset;
+        DrawTexture(bossBackgroundTexture, 0, by, tint);
+        DrawTexture(bossBackgroundTexture, 0,
+            by - bossBackgroundTexture.height, tint);
+    }
+
+    /*???????????????? 3) GAMEPLAY / HUD según estado ???????????????????????????*/
+    switch (gameState)
+    {
     case MENU:
-        if (menuTexture.id > 0) {
-            DrawTexture(menuTexture, 0, 0, WHITE);
-        }
+        if (menuTexture.id) DrawTexture(menuTexture, 0, 0, WHITE);
         DrawText("GALAGA 88", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
         DrawText("Press ENTER to start", SCREEN_WIDTH / 2 - 130, SCREEN_HEIGHT / 2, 20, WHITE);
-        break; 
+        break;
 
     case LEVEL1:
-    {
-    
-        if (backgroundTexture.id > 0) {
-            int offsetY = (int)backgroundOffset;
-            DrawTexture(backgroundTexture, 0, offsetY, WHITE);
-            DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
-        }
-        {
-            // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
-            Rectangle pr = player.GetRect();
-            DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
-        }
-        
-        
-
-        // Balas del Player
-        for (auto& pb : playerBullets) {
-            pb.Draw();
-        }
-
-        // Enemigos
-        for (auto& e : enemies) {
-            if (e.IsActive()) {
-                Rectangle er = e.GetRect();
-                DrawTexture(enemyTexture, (int)er.x, (int)er.y, WHITE);
-            }
-        }
-
-        // Balas Enemigos
-        for (auto& eb : enemyBullets) {
-            if (eb.IsActive()) {
-                DrawRectangleRec(eb.GetRect(), ORANGE);
-            }
-        }
-
-        // Interfaz
-        DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
-        DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
-
-        if (player.GetLives() <= 0) {
-            DrawText("GAME OVER", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
-        }
-        break; // <-- Importante
-    }
-
     case LEVEL2:
-    {
-        
-
-        if (backgroundTexture.id > 0) {
-            int offsetY = (int)backgroundOffset;
-            DrawTexture(backgroundTexture, 0, offsetY, WHITE);
-            DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
-        }
-        {
-            // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
-            Rectangle pr = player.GetRect();
-            DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
-        }
-        
-
-        for (auto& pb : playerBullets) {
-            pb.Draw();
-        }
-
-        for (auto& e : enemies) {
-            if (e.IsActive()) {
-                Rectangle er = e.GetRect();
-                DrawTexture(enemyTexture, (int)er.x, (int)er.y, WHITE);
-            }
-        }
-        for (auto& eb : enemyBullets) {
-            if (eb.IsActive()) {
-                DrawRectangleRec(eb.GetRect(), ORANGE);
-            }
-        }
-
-        DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
-        DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
-
-        if (player.GetLives() <= 0) {
-            DrawText("GAME OVER", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
-        }
-        break; // <-- Importante
-    }
-
-    //case BOSS:
-    //{
-
-    //    // --- Dibujar el fondo desplazándose ---
-    //    if (backgroundTexture.id > 0) {
-    //        int offsetY = (int)backgroundOffset;
-    //        DrawTexture(backgroundTexture, 0, offsetY, WHITE);
-    //        DrawTexture(backgroundTexture, 0, offsetY - backgroundTexture.height, WHITE);
-    //    }
-    //    {
-    //        // Si quisieras sobrescribir su Draw() para usar la textura que cargaste aquí:
-    //        Rectangle pr = player.GetRect();
-    //        DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
-    //    }
-    // 
-    //
-    //    // Balas del Player
-    //    for (auto& pb : playerBullets) {
-    //        pb.Draw();
-    //    }
-
-    //    // Balas Enemigos (si todavía se usan en BOSS)
-    //    for (auto& eb : enemyBullets) {
-    //        if (eb.IsActive()) {
-    //            DrawRectangleRec(eb.GetRect(), ORANGE);
-    //        }
-    //    }
-
-    //    // Boss
-    //    if (bossActive && boss.IsActive()) {
-    //        boss.Draw();
-    //        DrawText(TextFormat("Boss HP: %d", boss.GetLife()), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
-    //    }
-
-    //    // Balas Boss
-    //    for (auto& bb : bossBullets) {
-    //        if (bb.IsActive()) {
-    //            DrawRectangleRec(bb.GetRect(), PURPLE);
-    //        }
-    //    }
-
-    //    // UI
-    //    DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
-    //    DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
-
-    //    if (player.GetLives() <= 0) {
-    //        DrawText("GAME OVER", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
-    //    }
-    //    break; // <-- Importante
-    //}
-
     case BOSS:
     {
-        /* ?? fondo normal con scroll ?? */
-        int y = (int)backgroundOffset % backgroundTexture.height;
-        DrawTexture(backgroundTexture, 0, y, WHITE);
-        DrawTexture(backgroundTexture, 0, y - backgroundTexture.height, WHITE);
-
-        /* ?? resto de dibujo (player, balas, enemigos…) ?? */
         Rectangle pr = player.GetRect();
         DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
 
-        for (auto& pb : playerBullets)  pb.Draw();
-        for (auto& eb : enemyBullets)   eb.Draw();
-
-        if (gameState != BOSS) {
+        if (gameState != BOSS)
             for (auto& e : enemies)
-                if (e.IsActive()) DrawTexture(enemyTexture, (int)e.GetRect().x, (int)e.GetRect().y, WHITE);
-        }
+                if (e.IsActive())
+                    DrawTexture(enemyTexture,
+                        (int)e.GetRect().x, (int)e.GetRect().y, WHITE);
 
         if (bossActive && boss.IsActive()) {
             boss.Draw();
-            DrawText(TextFormat("Boss HP: %d", boss.GetLife()), SCREEN_WIDTH / 2 - 50, 10, 20, RED);
-            for (auto& bb : bossBullets) bb.Draw();
+            DrawText(TextFormat("Boss HP: %d", boss.GetLife()),
+                SCREEN_WIDTH / 2 - 50, 10, 20, RED);
         }
-        boss.Update();
-        boss.Draw();
-       /* break;*/
-        DrawText(TextFormat("Lives: %d", player.GetLives()), 10, 10, 20, WHITE);
-        DrawText(TextFormat("Score: %d", score), SCREEN_WIDTH - 120, 10, 20, WHITE);
+
+        for (auto& pb : playerBullets) pb.Draw();
+        for (auto& eb : enemyBullets)  eb.Draw();
+        for (auto& bb : bossBullets)   bb.Draw();
+
+        DrawText(TextFormat("Score: %d", score), 10, 10, 20, WHITE);
+        DrawText(TextFormat("Best:  %d", bestScore), 10, 35, 20, YELLOW);
+        DrawText(TextFormat("Lives: %d", player.GetLives()),
+            SCREEN_WIDTH - 110, 10, 20, WHITE);
         break;
     }
-
 
     case GAMEOVER:
         DrawText("GAME OVER", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 40, WHITE);
@@ -463,11 +387,6 @@ void Game::Draw() {
         DrawText("YOU WIN!", SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 - 50, 40, GREEN);
         DrawText("Press ENTER to return to MENU", SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2, 20, WHITE);
         break;
-    }
-    if (gameState == BOSS || bgTransitionActive) {
-        Color tint = WHITE;
-        tint.a = (unsigned char)(bgAlpha * 255);   // 0 ? transparente, 255 ? opaco
-        DrawTexture(bossBackgroundTexture, 0, 0, tint);
     }
 
     EndDrawing();
@@ -518,7 +437,7 @@ void Game::EnemyAttack() {
     for (auto& e : enemies) {
         if (!e.IsActive()) continue;
 
-        if (GetRandomValue(0, 100) < 3) {        // 2 % por enemigo
+        if (GetRandomValue(0, 100) < 3) {  //100      // 2 % por enemigo
             for (auto& eb : enemyBullets) {
                 if (!eb.IsActive()) {
                     Rectangle er = e.GetRect();
