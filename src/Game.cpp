@@ -24,6 +24,9 @@ Game::Game()
     , bgFadeSpeed(0.05f)
     , bossBgOffset(0.0f)
     , bossBgSpeed(1.5f)
+    , formationOffsetX(0.0f)
+    , formationDir(1.0f)
+    , formationSpeed(60.0f)
 {
     playerBullets.resize(MAX_BULLETS);
     enemyBullets.resize(MAX_ENEMY_BULLETS);
@@ -151,6 +154,9 @@ void Game::Update() {
 
     case LEVEL1:
     case LEVEL2:
+        formationOffsetX += formationDir * formationSpeed * GetFrameTime();
+        if (formationOffsetX < -40.0f || formationOffsetX > 40.0f)  // rebote
+            formationDir *= -1.0f;
         player.Update();
 
         // Player dispara
@@ -169,6 +175,7 @@ void Game::Update() {
         for (auto& pb : playerBullets) {
             pb.Update();
         }
+       
 
         // Enemigos
         UpdateEnemies();
@@ -393,26 +400,59 @@ void Game::Draw()
     EndDrawing();
 }
 
+void Game::UpdateEnemies()
+{
+    /* ?? 1)  ¿Arrancamos un ataque de grupo? ????????????????? */
+    bool lanzarDive = (GetRandomValue(0, 1000) < 2);   // 0,2?% frame
+    bool lanzarCircle = (GetRandomValue(0, 1000) < 2);   // 0,2?%
 
+    int  iniciados = 0;
 
-void Game::UpdateEnemies() {
+    /* ?? 2)  Recorremos la lista ???????????????????????????? */
     for (auto& e : enemies) {
         if (!e.IsActive()) continue;
+
+        /* aplicar desplazamiento de la formación */
+      /*  if (e.GetState() == EnemyState::FORMATION)
+            e.ApplyGroupOffset(formationOffsetX);*/
+
+        /* 2?A · arrancar Dive a los primeros 4 que cumplan */
+        e.SetGroupOffset(formationOffsetX);
+        //if (lanzarDive && iniciados < 4 &&
+        //    e.GetState() == EnemyState::FORMATION)
+        //{
+        //    e.StartDive();
+        //    iniciados++;
+        //}
+
+        ///* 2?B · si no lanzamos Dive, prueba Circle (otros 4) */
+        //if (!lanzarDive && lanzarCircle && iniciados < 4 &&
+        //    e.GetState() == EnemyState::FORMATION)
+        //{
+        //    e.StartCircle();
+        //    iniciados++;
+        //}
+        if (e.GetState() == EnemyState::FORMATION) {
+            if (lanzarDive && iniciados < 4) { e.StartDive();   iniciados++; }
+            else if (!lanzarDive && lanzarCircle && iniciados < 4)
+            {
+                e.StartCircle(); iniciados++;
+            }
+        }
         e.Update();
 
-        // Colisión con balas del jugador
+        /* colisión con balas del jugador */
         for (auto& pb : playerBullets) {
-            if (pb.IsActive()) {
-                if (CheckCollisionRecs(pb.GetRect(), e.GetRect())) {
-                    pb.Deactivate();
-                    e.Deactivate();
-                    score += 10;
-                    break;
-                }
+            if (pb.IsActive() && CheckCollisionRecs(pb.GetRect(), e.GetRect())) {
+                pb.Deactivate();
+                e.Deactivate();
+                score += 10;
+                break;
             }
         }
     }
 }
+
 
 void Game::CheckAllEnemiesDefeated() {
     bool allDead = true;

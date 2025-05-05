@@ -56,6 +56,12 @@ private:
     float bossBgOffset = 0.0f;
     float bossBgSpeed = 1.5f;
     int   bestScore = 0;
+
+  
+    float formationOffsetX;
+    float formationDir;
+    float formationSpeed;
+
 };
 
 #endif
