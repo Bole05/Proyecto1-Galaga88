@@ -411,27 +411,7 @@ void Game::UpdateEnemies()
     /* ?? 2)  Recorremos la lista ???????????????????????????? */
     for (auto& e : enemies) {
         if (!e.IsActive()) continue;
-
-        /* aplicar desplazamiento de la formación */
-      /*  if (e.GetState() == EnemyState::FORMATION)
-            e.ApplyGroupOffset(formationOffsetX);*/
-
-        /* 2?A · arrancar Dive a los primeros 4 que cumplan */
         e.SetGroupOffset(formationOffsetX);
-        //if (lanzarDive && iniciados < 4 &&
-        //    e.GetState() == EnemyState::FORMATION)
-        //{
-        //    e.StartDive();
-        //    iniciados++;
-        //}
-
-        ///* 2?B · si no lanzamos Dive, prueba Circle (otros 4) */
-        //if (!lanzarDive && lanzarCircle && iniciados < 4 &&
-        //    e.GetState() == EnemyState::FORMATION)
-        //{
-        //    e.StartCircle();
-        //    iniciados++;
-        //}
         if (e.GetState() == EnemyState::FORMATION) {
             if (lanzarDive && iniciados < 4) { e.StartDive();   iniciados++; }
             else if (!lanzarDive && lanzarCircle && iniciados < 4)
