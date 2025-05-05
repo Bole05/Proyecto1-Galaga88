@@ -269,6 +269,9 @@ void Game::Update() {
         // Esperar ENTER para volver a MENU
         if (IsKeyPressed(KEY_ENTER)) {
             gameState = MENU;
+            for (auto& pb : playerBullets) pb.Deactivate();
+            for (auto& eb : enemyBullets)  eb.Deactivate();
+            for (auto& bb : bossBullets)   bb.Deactivate();
         }
         break;
     }
@@ -428,6 +431,10 @@ void Game::CheckAllEnemiesDefeated() {
       
         bgTransitionActive = true;  
         bgAlpha = 0.0f;   
+
+        for (auto& pb : playerBullets) pb.Deactivate();
+        for (auto& eb : enemyBullets)  eb.Deactivate();
+        for (auto& bb : bossBullets)   bb.Deactivate();
     }
 }
 
