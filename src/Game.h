@@ -23,8 +23,9 @@ private:
     void UpdateEnemies();
     void CheckAllEnemiesDefeated();
     void EnemyAttack();
-    void BossAttack();
+    void BossAttack(); 
 
+    void LaunchOrbitRing();
     GameState gameState;
 
     Player               player;

@@ -20,7 +20,10 @@ public:
         return state;
     }
     void StartDive();
-    void StartCircle();
+    void StartOrbit(Enemy* anchor,
+        float radius,
+        float phase,
+        float speed);
 
     float GetBaseX() const { return formationPos.x; }
     void  ApplyGroupOffset(float dx) { rect.x = formationPos.x + dx; }
@@ -33,12 +36,13 @@ private:
     float speed;
     Vector2 formationPos;
 
-
+    Enemy* orbitAnchor = nullptr;
     Vector2 circleCenter{};
     float   circleRadius = 60.0f;
     float   circleAng = 0.0f; 
     float   circleSpeed = 2.5f;
-
+    float   circlePhase = 0.0f;
+    
     float patrolSpeed = 80.0f;
     float groupOffset = 0.0f;
 };

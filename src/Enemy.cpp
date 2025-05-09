@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include <cstdlib>
 #include <ctime>
+#include<cmath>
 
 Enemy::Enemy() {
     Init();
@@ -48,14 +49,20 @@ void Enemy::StartDive()
         angle = 0.0f;
     }
 }
-void Enemy::StartCircle()
-{
-    if (state == EnemyState::FORMATION) {
-        state = EnemyState::CIRCLE;
-        circleCenter = { formationPos.x, formationPos.y };
-        circleAng = 0.0f;
+void Enemy::StartOrbit(Enemy* anchor, float radius, float phase, float speed) {
+    orbitAnchor = anchor;
+    state = EnemyState::CIRCLE;
+    circleRadius = radius;
+    circlePhase = phase;
+    circleSpeed = speed;
+    circleAng = 0.0f;
+
+    if (anchor) {
+        Rectangle ar = anchor->GetRect();
+        circleCenter = { ar.x + ar.width / 2.0f, ar.y + ar.height / 2.0f };
     }
 }
+
 void Enemy::Update()
 {
     if (!active) return;
@@ -92,14 +99,18 @@ void Enemy::Update()
         }
         break;
     case EnemyState::CIRCLE:
-        circleAng += circleSpeed * dt;          // avanza ángulo
-        rect.x = circleCenter.x + cosf(circleAng) * circleRadius;
-        rect.y = circleCenter.y + sinf(circleAng) * circleRadius;
+        if (orbitAnchor && orbitAnchor->IsActive()) {
+            Rectangle ar = orbitAnchor->GetRect();
+            circleCenter = { ar.x + ar.width / 2.0f, ar.y + ar.height / 2.0f };
+        }
+        circleAng += circleSpeed * dt;
+        rect.x = circleCenter.x + cosf(circleAng + circlePhase) * circleRadius - rect.width / 2.0f;
+        rect.y = circleCenter.y + sinf(circleAng + circlePhase) * circleRadius - rect.height / 2.0f;
 
-        /* después de una vuelta completa, vuelve a formación */
         if (circleAng >= 2 * PI) {
             rect = { formationPos.x, formationPos.y, rect.width, rect.height };
             state = EnemyState::FORMATION;
+            orbitAnchor = nullptr;
         }
         break;
     }

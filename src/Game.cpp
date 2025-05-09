@@ -4,7 +4,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <resource_dir.h> 
-
+#include <algorithm>
+#include <random>
 Game::Game()
     : gameState(MENU)
     , menuTexture{}
@@ -399,29 +400,60 @@ void Game::Draw()
 
     EndDrawing();
 }
+void Game::LaunchOrbitRing() {
+    constexpr int kRingSize = 5;       // 1 centro + 4 órbitas
+    constexpr int kOrbits = kRingSize - 1;
 
-void Game::UpdateEnemies()
-{
-    /* ?? 1)  ¿Arrancamos un ataque de grupo? ????????????????? */
-    bool lanzarDive = (GetRandomValue(0, 1000) < 2);   // 0,2?% frame
-    bool lanzarCircle = (GetRandomValue(0, 1000) < 2);   // 0,2?%
+    std::vector<Enemy*> pool;
+    for (auto& e : enemies)
+        if (e.IsActive() && e.GetState() == EnemyState::FORMATION)
+            pool.push_back(&e);
+    if (pool.size() < kRingSize) return;
 
-    int  iniciados = 0;
+    std::mt19937 rng(static_cast<uint32_t>(GetRandomValue(0, 10000)));
+    std::shuffle(pool.begin(), pool.end(), rng);
 
-    /* ?? 2)  Recorremos la lista ???????????????????????????? */
+    Enemy* anchor = pool[0];                 // el del centro
+    Rectangle ar = anchor->GetRect();
+    Vector2 center{ ar.x + ar.width / 2.0f, ar.y + ar.height / 2.0f };
+
+    const float radius = 80.0f;
+    const float speed = 2.5f;
+    for (int i = 0; i < kOrbits; ++i) {
+        float phase = i * 2 * PI / kOrbits;  // espaciado uniforme
+        pool[i + 1]->StartOrbit(anchor, radius, phase, speed);
+    }
+
+    for (auto& e : enemies) {
+        if (!e.IsActive()) continue;
+        if (e.GetState() != EnemyState::FORMATION) continue;
+        if (&e == anchor) continue;  // ancla queda quieta
+
+        // 25 % de probabilidad de dive inmediato
+        if (GetRandomValue(0, 3) == 0) {
+            e.StartDive();
+        }
+    }
+}
+
+
+
+void Game::UpdateEnemies() {
+    bool lanzarDive = (GetRandomValue(0, 1000) < 2);
+    if (GetRandomValue(0, 1000) < 2) LaunchOrbitRing();   // probabilidad 0,2 %
+
+    int iniciados = 0;
     for (auto& e : enemies) {
         if (!e.IsActive()) continue;
         e.SetGroupOffset(formationOffsetX);
         if (e.GetState() == EnemyState::FORMATION) {
-            if (lanzarDive && iniciados < 4) { e.StartDive();   iniciados++; }
-            else if (!lanzarDive && lanzarCircle && iniciados < 4)
-            {
-                e.StartCircle(); iniciados++;
+            if (lanzarDive && iniciados < 4) {
+                e.StartDive();
+                iniciados++;
             }
         }
         e.Update();
 
-        /* colisión con balas del jugador */
         for (auto& pb : playerBullets) {
             if (pb.IsActive() && CheckCollisionRecs(pb.GetRect(), e.GetRect())) {
                 pb.Deactivate();
@@ -432,7 +464,6 @@ void Game::UpdateEnemies()
         }
     }
 }
-
 
 void Game::CheckAllEnemiesDefeated() {
     bool allDead = true;
