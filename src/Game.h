@@ -1,4 +1,3 @@
-// Game.h
 #ifndef GAME_H
 #define GAME_H
 
@@ -8,7 +7,7 @@
 #include "Enemy.h"
 #include "Boss.h"
 #include "Bullet.h"
-
+#include "raylib.h" 
 class Game {
 public:
     Game();
@@ -38,12 +37,18 @@ private:
     // Texturas
     Texture2D menuTexture;
     Texture2D backgroundTexture;
-    Texture2D bossBackgroundTexture;  // ? añadir
+    Texture2D bossBackgroundTexture; 
   
     Texture2D playerTexture;
     Texture2D enemyTexture;
-    Texture2D bossTexture; // Si tienes un PNG para el boss
+    Texture2D bossTexture; 
     Texture2D PlyBulletText;
+
+    //audios
+    Sound sfxPlayerShot{};
+    Sound sfxEnemyHit{};
+    Sound sfxPlayerHurt{};
+    
     int  score;
     bool bossActive;
   

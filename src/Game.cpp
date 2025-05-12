@@ -36,7 +36,7 @@ Game::Game()
 
 
 Game::~Game() {
- 
+    //texturas
     UnloadTexture(menuTexture);
     UnloadTexture(backgroundTexture);
     UnloadTexture(playerTexture);
@@ -44,6 +44,12 @@ Game::~Game() {
     UnloadTexture(bossTexture);
     UnloadTexture(PlyBulletText);
 
+    //audios
+    UnloadSound(sfxPlayerShot);    
+    UnloadSound(sfxEnemyHit);
+    UnloadSound(sfxPlayerHurt);
+   
+    CloseAudioDevice();
     CloseWindow();
 }
 
@@ -54,6 +60,7 @@ void Game::Init() {
     srand((unsigned int)time(nullptr));
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Galaga 88 - Raylib");
+    InitAudioDevice();
     SetTargetFPS(90);
 
    
@@ -116,6 +123,17 @@ void Game::Init() {
          for (auto& b : playerBullets)  
              b.SetTexture(playerBulletTex);
 
+         //Audios
+         sfxPlayerShot = LoadSound("laser3.ogg");
+         SetSoundVolume(sfxPlayerShot, 2.5f);
+
+         sfxEnemyHit = LoadSound("hit2.ogg");   
+         SetSoundVolume(sfxEnemyHit, 2.0f);
+
+         sfxPlayerHurt = LoadSound("hurt1.ogg");   
+         SetSoundVolume(sfxPlayerHurt, 2.0f);
+
+
     }
 
     player.Init();
@@ -167,6 +185,8 @@ void Game::Update() {
                     Rectangle pr = player.GetRect();
                     Vector2 pos{ pr.x + pr.width / 2 - 5, pr.y };
                     pb.Activate(pos);
+
+                    PlaySound(sfxPlayerShot);
                     break;
                 }
             }
@@ -196,6 +216,7 @@ void Game::Update() {
                 if (CheckCollisionRecs(r, player.GetRect())) {
                     eb.Deactivate();
                     player.TakeDamage();
+                    PlaySound(sfxPlayerHurt);
                     if (player.GetLives() <= 0) {
                         gameState = GAMEOVER;
                     }
@@ -214,16 +235,17 @@ void Game::Update() {
     
     case BOSS: {
         player.Update();
-
         boss.Update();
-        //player.Update();
-        //boss.Update();
+
         if (IsKeyPressed(KEY_SPACE)) {
             for (auto& pb : playerBullets) {
                 if (!pb.IsActive()) {
                     Rectangle pr = player.GetRect();
                     Vector2 pos{ pr.x + pr.width / 2 - 5, pr.y };
                     pb.Activate(pos);
+
+                    PlaySound(sfxPlayerShot);
+
                     break;
                 }
             }
@@ -458,6 +480,8 @@ void Game::UpdateEnemies() {
             if (pb.IsActive() && CheckCollisionRecs(pb.GetRect(), e.GetRect())) {
                 pb.Deactivate();
                 e.Deactivate();
+
+                PlaySound(sfxEnemyHit);
                 score += 10;
                 break;
             }
@@ -493,7 +517,7 @@ void Game::EnemyAttack() {
     for (auto& e : enemies) {
         if (!e.IsActive()) continue;
 
-        if (GetRandomValue(0, 100) < 3) {  
+        if (GetRandomValue(0, 100) < 0.5) {  
             for (auto& eb : enemyBullets) {
                 if (!eb.IsActive()) {
                     Rectangle er = e.GetRect();
