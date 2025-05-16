@@ -51,7 +51,8 @@ private:
     
 
     Music  bgmStage{};
-    
+    Music  bgmMenu{};
+    Music  bgmGameOver{};
     
     int  score;
     bool bossActive;

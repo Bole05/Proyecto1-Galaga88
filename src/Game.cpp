@@ -51,6 +51,8 @@ Game::~Game() {
    
 
     UnloadMusicStream(bgmStage);
+    UnloadMusicStream(bgmMenu);
+    UnloadMusicStream(bgmGameOver);
     CloseAudioDevice();
     CloseWindow();
 }
@@ -139,7 +141,12 @@ void Game::Init() {
          SetMusicVolume(bgmStage, 1.8f);      // 180 % volumen
          PlayMusicStream(bgmStage);
          
+         bgmMenu = LoadMusicStream("02. Game Start.mp3"); 
+         SetMusicVolume(bgmMenu, 0.6f);
+         PlayMusicStream(bgmMenu);
 
+         bgmGameOver = LoadMusicStream("13. Game Over Music.mp3");   // NUEVO
+         SetMusicVolume(bgmGameOver, 0.7f);
 
     }
 
@@ -159,10 +166,30 @@ void Game::InitEnemies() {
 void Game::Update() {
 
     UpdateMusicStream(bgmStage);
-    if (gameState == MENU || gameState == GAMEOVER || gameState == WIN)
+    UpdateMusicStream(bgmMenu);
+    UpdateMusicStream(bgmGameOver);
+    bool inMenu = (gameState == MENU);
+    bool inGame = (gameState == LEVEL1 || gameState == LEVEL2 || gameState == BOSS);
+    bool inGameOver = (gameState == GAMEOVER || gameState == WIN);
+    if (inMenu) {
+        ResumeMusicStream(bgmMenu);
         PauseMusicStream(bgmStage);
-    else
+        PauseMusicStream(bgmGameOver);
+    }
+    else if (inGame) {
         ResumeMusicStream(bgmStage);
+        PauseMusicStream(bgmMenu);
+        PauseMusicStream(bgmGameOver);
+    }
+    else if (inGameOver) {
+        // ??? Lanzar Game-Over solo una vez ???????????????????????
+        if (!IsMusicStreamPlaying(bgmGameOver))
+            PlayMusicStream(bgmGameOver);   // ? ¡aquí está la clave!
+
+        PauseMusicStream(bgmMenu);
+        PauseMusicStream(bgmStage);
+    }
+  
 
 
     float delta = GetFrameTime();
