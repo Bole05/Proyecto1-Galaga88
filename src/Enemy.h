@@ -28,6 +28,10 @@ public:
     float GetBaseX() const { return formationPos.x; }
     void  ApplyGroupOffset(float dx) { rect.x = formationPos.x + dx; }
     void  SetGroupOffset(float dx) { groupOffset = dx; }
+
+
+
+
 private:
     bool active;
     EnemyState state;
@@ -45,6 +49,7 @@ private:
     
     float patrolSpeed = 80.0f;
     float groupOffset = 0.0f;
+
 };
 
 #endif
