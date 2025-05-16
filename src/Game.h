@@ -49,6 +49,10 @@ private:
     Sound sfxEnemyHit{};
     Sound sfxPlayerHurt{};
     
+
+    Music  bgmStage{};
+    
+    
     int  score;
     bool bossActive;
   

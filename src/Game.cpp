@@ -49,6 +49,8 @@ Game::~Game() {
     UnloadSound(sfxEnemyHit);
     UnloadSound(sfxPlayerHurt);
    
+
+    UnloadMusicStream(bgmStage);
     CloseAudioDevice();
     CloseWindow();
 }
@@ -133,6 +135,11 @@ void Game::Init() {
          sfxPlayerHurt = LoadSound("hurt1.ogg");   
          SetSoundVolume(sfxPlayerHurt, 2.0f);
 
+         bgmStage = LoadMusicStream("11. Scroll Stage Music.mp3");
+         SetMusicVolume(bgmStage, 1.8f);      // 180 % volumen
+         PlayMusicStream(bgmStage);
+         
+
 
     }
 
@@ -150,6 +157,14 @@ void Game::InitEnemies() {
 }
 
 void Game::Update() {
+
+    UpdateMusicStream(bgmStage);
+    if (gameState == MENU || gameState == GAMEOVER || gameState == WIN)
+        PauseMusicStream(bgmStage);
+    else
+        ResumeMusicStream(bgmStage);
+
+
     float delta = GetFrameTime();
     if (WindowShouldClose()) {
         gameState = GAMEOVER;
