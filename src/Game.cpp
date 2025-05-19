@@ -6,13 +6,13 @@
 #include <resource_dir.h> 
 #include <algorithm>
 #include <random>
+#include<vector>
 Game::Game()
     : gameState(MENU)
     , menuTexture{}
     , backgroundTexture{}
     , bossBackgroundTexture{}
     , playerTexture{}
-    , enemyTexture{}
     , bossTexture{}
     , PlyBulletText{}
     , score(0)
@@ -40,7 +40,10 @@ Game::~Game() {
     UnloadTexture(menuTexture);
     UnloadTexture(backgroundTexture);
     UnloadTexture(playerTexture);
-    UnloadTexture(enemyTexture);
+
+    for (Texture2D& t : enemyTextures) UnloadTexture(t);
+    enemyTextures.clear();
+
     UnloadTexture(bossTexture);
     UnloadTexture(PlyBulletText);
 
@@ -104,10 +107,10 @@ void Game::Init() {
        
         
         // Enemy
-        Image enemyImg = LoadImage("fff.png");
+     /*   Image enemyImg = LoadImage("fff.png");
         ImageResize(&enemyImg, 40, 40);
         enemyTexture = LoadTextureFromImage(enemyImg);
-        UnloadImage(enemyImg);
+        UnloadImage(enemyImg);*/
 
          //Boss
          Image bossImg = LoadImage("Arcade_-_Galaga_Arrangement_-_King_Galaspark-removebg-preview.png");
@@ -148,6 +151,27 @@ void Game::Init() {
          bgmGameOver = LoadMusicStream("13. Game Over Music.mp3");   // NUEVO
          SetMusicVolume(bgmGameOver, 0.7f);
 
+         enemyTextures.clear();
+         enemyTextures.reserve(NUM_ENEMY_TYPES);
+
+         const char* enemyFiles[NUM_ENEMY_TYPES] =
+         {
+             "2342_x4-removebg-preview4.png",   // enemy_0  azul-verde
+             "34315_x4-removebg-preview3.png",  // enemy_1  amarillo
+             "enemy_1_processed1.png",          // enemy_2  rojo-azul
+             "enemy_2_processed1.png",          // enemy_3  violeta-azul
+                                  
+         };
+
+         for (int i = 0; i < NUM_ENEMY_TYPES; ++i)
+         {
+             Texture2D tex = LoadTexture(enemyFiles[i]);
+
+             if (tex.id == 0)   // aviso si falta el archivo
+                 TraceLog(LOG_WARNING, "No se encontró %s", enemyFiles[i]);
+
+             enemyTextures.push_back(tex);
+         }
     }
 
     player.Init();
@@ -155,11 +179,17 @@ void Game::Init() {
     InitEnemies();
 }
 
-void Game::InitEnemies() {
+void Game::InitEnemies()
+{
     enemies.clear();
     enemies.resize(MAX_ENEMIES);
-    for (auto& e : enemies) {
-        e.Init();
+
+    for (auto& e : enemies)
+    {
+        e.Init();   // posición, estado, etc.
+
+        int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1); // 0..4
+        e.SetSprite(enemyTextures[type]);                  // 2 columnas
     }
 }
 
@@ -431,8 +461,9 @@ void Game::Draw()
         if (gameState != BOSS)
             for (auto& e : enemies)
                 if (e.IsActive())
-                    DrawTexture(enemyTexture,
-                        (int)e.GetRect().x, (int)e.GetRect().y, WHITE);
+                    e.Draw();
+ /*                   DrawTexture(enemyTexture,
+                        (int)e.GetRect().x, (int)e.GetRect().y, WHITE);*/
 
         if (bossActive && boss.IsActive()) {
             boss.Draw();

@@ -62,12 +62,31 @@ void Enemy::StartOrbit(Enemy* anchor, float radius, float phase, float speed) {
         circleCenter = { ar.x + ar.width / 2.0f, ar.y + ar.height / 2.0f };
     }
 }
+void Enemy::SetSprite(Texture2D tex, int cols, float secPerFrame)
+{
+    sprite = tex;
+    frameCols = cols;
+    frameTime = secPerFrame;
+
+    currentFrame = 0;
+    timer = 0.0f;
+}
 
 void Enemy::Update()
 {
     if (!active) return;
 
     float dt = GetFrameTime();
+
+    if (sprite.id != 0)
+    {
+        timer += dt;
+        if (timer >= frameTime)
+        {
+            timer -= frameTime;
+            currentFrame = (currentFrame + 1) % frameCols;   // 0?1?0…
+        }
+    }
 
     switch (state)
     {
@@ -119,5 +138,16 @@ void Enemy::Update()
 void Enemy::Draw()
 {
     if (!active) return;
-    DrawRectangleRec(rect, RED);   // sustituye por textura si la tienes
+    if (sprite.id != 0)
+    {
+        int     fw = sprite.width / frameCols;          // ancho frame
+        Rectangle src{ (float)(currentFrame * fw), 0.0f,
+                       (float)fw,         (float)sprite.height };
+
+        DrawTextureRec(sprite, src, { rect.x, rect.y }, WHITE);
+    }
+    else
+    {
+        DrawRectangleRec(rect, RED);   // fallback por si falta la textura
+    }
 }

@@ -24,6 +24,11 @@ public:
         float radius,
         float phase,
         float speed);
+    
+    void SetSprite(Texture2D tex,
+        int   cols = 2,
+        float secPerFrame = 0.15f);
+
 
     float GetBaseX() const { return formationPos.x; }
     void  ApplyGroupOffset(float dx) { rect.x = formationPos.x + dx; }
@@ -50,6 +55,11 @@ private:
     float patrolSpeed = 80.0f;
     float groupOffset = 0.0f;
 
+    Texture2D sprite{};
+    int       frameCols = 1;     // columnas en la hoja (default 1)
+    int       currentFrame = 0;
+    float     frameTime = 0.15f; // seg entre cambios
+    float     timer = 0.0f;
 };
 
 #endif
