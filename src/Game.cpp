@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <random>
 #include<vector>
+#include "raymath.h"  
 Game::Game()
     : gameState(MENU)
     , menuTexture{}
@@ -181,15 +182,48 @@ void Game::Init() {
 
 void Game::InitEnemies()
 {
+    //enemies.clear();
+    //enemies.resize(MAX_ENEMIES);
+
+    //for (auto& e : enemies)
+    //{
+    //    e.Init();   // posición, estado, etc.
+
+    //    int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1); // 0..4
+    //    e.SetSprite(enemyTextures[type]);                  // 2 columnas
+    //}
+    constexpr int COLS = 10;
+    constexpr int ROWS = 3;
+    bool used[ROWS][COLS] = {};          // todo a false
+
     enemies.clear();
     enemies.resize(MAX_ENEMIES);
 
     for (auto& e : enemies)
     {
-        e.Init();   // posición, estado, etc.
+        e.Init();                        // estado, velocities…
 
-        int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1); // 0..4
-        e.SetSprite(enemyTextures[type]);                  // 2 columnas
+        /* elegir celda libre --------------------------------*/
+        int col, row;
+        do {
+            col = GetRandomValue(0, COLS - 1);
+            row = GetRandomValue(0, ROWS - 1);
+        } while (used[row][col]);
+
+        used[row][col] = true;
+
+        /* coordenadas base de formación ---------------------*/
+        float x0 = 40.0f + col * 60.0f;  // separación 60 px
+        float y0 = 80.0f + row * 60.0f;
+
+        Rectangle r = e.GetRect();
+        r.x = x0;
+        r.y = y0;
+        e.SetRect(r);                    // (usa tu setter o toca directo)
+
+        /* sprite aleatorio ----------------------------------*/
+        int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1);
+        e.SetSprite(enemyTextures[type]);   // 2 frames
     }
 }
 
@@ -457,7 +491,9 @@ void Game::Draw()
     {
         Rectangle pr = player.GetRect();
         DrawTexture(playerTexture, (int)pr.x, (int)pr.y, WHITE);
-
+        for (auto& e : enemies)                    // 2) recorre la lista
+            if (e.IsActive())
+                e.Draw(pr);
         if (gameState != BOSS)
             for (auto& e : enemies)
                 if (e.IsActive())
@@ -587,7 +623,7 @@ void Game::CheckAllEnemiesDefeated() {
 }
 
 void Game::EnemyAttack() {
-    for (auto& e : enemies) {
+   /* for (auto& e : enemies) {
         if (!e.IsActive()) continue;
 
         if (GetRandomValue(0, 100) < 0.5) {  
@@ -596,6 +632,32 @@ void Game::EnemyAttack() {
                     Rectangle er = e.GetRect();
                     Vector2 pos{ er.x + er.width / 2 - 5, er.y + er.height };
                     eb.Activate(pos);
+                    break;
+                }
+            }
+        }
+    }*/
+
+
+    Rectangle pr = player.GetRect();
+    Vector2 playerCenter{ pr.x + pr.width / 2, pr.y + pr.height / 2 };
+
+    for (auto& e : enemies)
+    {
+        if (!e.IsActive()) continue;
+        if (GetRandomValue(0, 100) < 2)          // 2 % prob.
+        {
+            for (auto& eb : enemyBullets)
+            {
+                if (!eb.IsActive())
+                {
+                    Rectangle er = e.GetRect();
+                    Vector2 enemyCenter{ er.x + er.width / 2, er.y + er.height / 2 };
+
+                    Vector2 dir = Vector2Normalize(Vector2Subtract(playerCenter, enemyCenter));
+                    Vector2 vel = Vector2Scale(dir, ENEMY_BULLET_SPEED);
+
+                    eb.Activate(enemyCenter, vel);
                     break;
                 }
             }

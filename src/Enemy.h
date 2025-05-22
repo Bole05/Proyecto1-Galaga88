@@ -10,6 +10,7 @@ public:
     void Init() override;
     void Update() override;
     void Draw() override;
+    void Draw(const Rectangle& playerRect);
 
     bool IsActive() const { return active; }
     void Deactivate() { active = false; }
@@ -33,7 +34,7 @@ public:
     float GetBaseX() const { return formationPos.x; }
     void  ApplyGroupOffset(float dx) { rect.x = formationPos.x + dx; }
     void  SetGroupOffset(float dx) { groupOffset = dx; }
-
+    
 
 
 
@@ -60,6 +61,7 @@ private:
     int       currentFrame = 0;
     float     frameTime = 0.15f; // seg entre cambios
     float     timer = 0.0f;
+    bool debugDraw = false;
 };
 
 #endif

@@ -23,8 +23,8 @@ void Enemy::Reset() {
 void Enemy::Init()
 {
     
-    rect.width = 40;
-    rect.height = 40;
+    rect.width = 55;
+    rect.height = 55;
     rect.x = (float)(rand() % (SCREEN_WIDTH - 40));
     rect.y = -rect.height;
 
@@ -39,7 +39,10 @@ void Enemy::Init()
     int row = rand() % 3;
     formationPos = { 60 + col * 50.0f,  100 + row * 50.0f };
     patrolSpeed = 60.0f + (float)(rand() % 40);
+
+
 }
+
 
 void Enemy::StartDive()
 {
@@ -137,17 +140,68 @@ void Enemy::Update()
 
 void Enemy::Draw()
 {
+    // Intencionalmente vacío (Game.cpp ya usa Draw(playerRect))
+}
+
+void Enemy::Draw(const Rectangle& playerRect)
+{
+   // if (!active) return;
+
+   // // ------- parámetros de escala -------
+   // const float scale = 0.6f;           // 40 % más pequeño
+
+   // if (sprite.id != 0)
+   // {
+   //     int fw = sprite.width / frameCols;
+   //     int fh = sprite.height;
+
+   //     Rectangle src{ (float)(currentFrame * fw), 0.0f,
+   //                    (float)fw, (float)fh };
+
+   //     float dw = rect.width * scale;
+   //     float dh = rect.height * scale;
+
+   //     Rectangle dst{
+   //         rect.x + (rect.width - dw) * 0.5f,
+   //         rect.y + (rect.height - dh) * 0.5f,
+   //         dw, dh
+   //     };
+
+   //     // ángulo hacia el jugador
+   ///*     Vector2 ePos{ rect.x + rect.width / 2,  rect.y + rect.height / 2 };
+   //     Vector2 pPos{ playerRect.x + playerRect.width / 2,
+   //                   playerRect.y + playerRect.height / 2 };
+
+   //     float angle = atan2f(pPos.y - ePos.y, pPos.x - ePos.x) * RAD2DEG + 90.0f;
+
+   //     DrawTexturePro(sprite, src, dst,
+   //         { dw / 2.0f, dh / 2.0f },
+   //         angle,
+   //         WHITE);*/
+   // }
     if (!active) return;
+
     if (sprite.id != 0)
     {
-        int     fw = sprite.width / frameCols;          // ancho frame
-        Rectangle src{ (float)(currentFrame * fw), 0.0f,
-                       (float)fw,         (float)sprite.height };
+        /* ===== 1) escala ==================================== */
+        const float scale = 0.7f;          // usa el tamaño exacto
 
-        DrawTextureRec(sprite, src, { rect.x, rect.y }, WHITE);
-    }
-    else
-    {
-        DrawRectangleRec(rect, RED);   // fallback por si falta la textura
+        int fw = sprite.width / frameCols;
+        int fh = sprite.height;
+
+        Rectangle src{ (float)(currentFrame * fw), 0, (float)fw, (float)fh };
+
+        Rectangle dst{ rect.x, rect.y,
+                       rect.width * scale,
+                       rect.height * scale };
+
+        /* ===== 2) ángulo fijo hacia abajo =================== */
+        float angleDeg = 360.0f;           // todos apuntan al jugador
+
+        // --- dibuja ---
+        DrawTexturePro(sprite, src, dst,
+            { dst.width / 2, dst.height / 2 },
+            angleDeg,
+            WHITE);
     }
 }
