@@ -9,7 +9,7 @@
 ## Team Members
 
 - [Yangfeng Xu](https://github.com/yangfeng-xu)
-- [Bole Wu](https://github.com/anagomez)
+- [Bole Wu](https://github.com/Bole05)
 
 ## Short Game Description
 
