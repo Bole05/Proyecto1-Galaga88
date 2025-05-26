@@ -107,24 +107,18 @@ void Game::Init() {
 
         for (auto& b : enemyBullets)   // la misma textura para todas
             b.SetTexture(enemyBulletTex);
-        ////bala boss
-        //Image bb1 = LoadImage("bullet boss1.png");
         Image bb2 = LoadImage("bullet boss2.png");
-       /* ImageResize(&bb1, 40, 60);*/
         ImageResize(&bb2, 60, 40);
         ImageRotateCW(&bb2);
         ImageRotateCW(&bb2);
         ImageRotateCW(&bb2);
-        /*bossBulletTex1 = LoadTextureFromImage(bb1);     */     //  ? miembro
         bossBulletTex2 = LoadTextureFromImage(bb2);          //  ? miembro
-        /*UnloadImage(bb1);*/
         UnloadImage(bb2);
 
         for (auto& b : bossBullets)                 // todas usan la misma
             b.SetTexture(bossBulletTex2);
-        /*for (size_t i = 0; i < bossBullets.size(); ++i)*/
-            //bossBullets/*[i]*/.SetTexture((i & 1) ? bossBulletTex2 : bossBulletTex1);
-        /* ---------- Parámetros del fundido ---------- */
+
+        /* ---------- Parámetros ---------- */
         bgTransitionActive = false;
         bgAlpha = 0.0f;   // opacidad inicial
         bgFadeSpeed = 0.05f;
@@ -133,7 +127,6 @@ void Game::Init() {
 
         // Player
         Image playerImg = LoadImage("99809.png");
-        // Por si quieres redimensionar a 40x40
         ImageResize(&playerImg, 75, 75);
         playerTexture = LoadTextureFromImage(playerImg);
         UnloadImage(playerImg);
@@ -146,9 +139,8 @@ void Game::Init() {
          boss.SetTexture(bossTexture);
 
          //bullet Player
-    
          Image pBulletImg = LoadImage("Galaga88_Sprite_Ampliado-removebg-preview.png");
-         ImageResize(&pBulletImg, 46, 40);              // tamaño final de la bala
+         ImageResize(&pBulletImg, 46, 40);
          Texture2D playerBulletTex = LoadTextureFromImage(pBulletImg);
          UnloadImage(pBulletImg);
 
@@ -196,22 +188,13 @@ void Game::Init() {
          {
              Texture2D tex = LoadTexture(enemyFiles[i]);
 
-             if (tex.id == 0) {                        // ? no se cargó
+             if (tex.id == 0) {                      
                  TraceLog(LOG_WARNING,
                      "No se encontró %s", enemyFiles[i]);
-                 //continue;                             // ? NO lo añadas
+                 //continue;                          
              }
-             enemyTextures.push_back(tex);             // ? solo válidos
+             enemyTextures.push_back(tex);             
          }
-         //for (int i = 0; i < NUM_ENEMY_TYPES; ++i)
-         //{
-         //    Texture2D tex = LoadTexture(enemyFiles[i]);
-
-         //    if (tex.id == 0) {  // aviso si falta el archivo
-         //        TraceLog(LOG_WARNING, "No se encontró %s", enemyFiles[i]);
-         //    }
-         //    enemyTextures.push_back(tex);
-         //}
     }
 
     player.Init();
@@ -230,9 +213,8 @@ void Game::InitEnemies()
 
     for (auto& e : enemies)
     {
-        e.Init();                        // estado, velocities…
+        e.Init();                        // estado, velocitades
 
-        /* elegir celda libre --------------------------------*/
         int col, row;
         do {
             col = GetRandomValue(0, COLS - 1);
@@ -241,17 +223,15 @@ void Game::InitEnemies()
 
         used[row][col] = true;
 
-        /* coordenadas base de formación ---------------------*/
         float x0 = 40.0f + col * 60.0f;  // separación 60 px
         float y0 = 80.0f + row * 60.0f;
 
         Rectangle r = e.GetRect();
         r.x = x0;
         r.y = y0;
-        e.SetRect(r);                    // (usa tu setter o toca directo)
+        e.SetRect(r); 
 
         /* sprite aleatorio ----------------------------------*/
-        /*int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1);*/
         int type = GetRandomValue(0, (int)enemyTextures.size() - 1);
         e.SetSprite(enemyTextures[type]);   // 2 frames
     }
@@ -276,9 +256,8 @@ void Game::Update() {
         PauseMusicStream(bgmGameOver);
     }
     else if (inGameOver) {
-        // ??? Lanzar Game-Over solo una vez ???????????????????????
         if (!IsMusicStreamPlaying(bgmGameOver))
-            PlayMusicStream(bgmGameOver);   // ? ¡aquí está la clave!
+            PlayMusicStream(bgmGameOver);
 
         PauseMusicStream(bgmMenu);
         PauseMusicStream(bgmStage);
@@ -322,7 +301,7 @@ void Game::Update() {
             {
                 if (!pb.IsActive())
                 {
-                    Rectangle pr = player.GetRect();                // ? caja nave
+                    Rectangle pr = player.GetRect();            
                     Vector2 pos{
                         pr.x + pr.width * 0.5f,   // centro horizontal
                         pr.y                       // borde superior de la nave
@@ -347,20 +326,18 @@ void Game::Update() {
         EnemyAttack();
         for (auto& eb : enemyBullets) eb.Update();
 
-        /*------------- COMPROBAR LÍMITES Y COLISIÓN ----------------------*/
+        /*------------- LÍMITES Y COLISIÓN ----------------------*/
         for (auto& eb : enemyBullets)
         {
             if (!eb.IsActive()) continue;
 
             Rectangle r = eb.GetRect();          // rectángulo actualizado
 
-            /* 1) fuera de pantalla ? desactivar */
             if (r.y > SCREEN_HEIGHT) {
                 eb.Deactivate();
                 continue;
             }
 
-            /* 2) colisión con el jugador */
             if (CheckCollisionRecs(r, player.GetRect()))
             {
                 eb.Deactivate();
@@ -374,11 +351,8 @@ void Game::Update() {
                     pr.y + pr.height * (0.5f + 0.20f)
                 };
                 Explosion ex;
-                /*ex.Start(center, explBossTex, 4, 0.10f, 1.4f);
-                bossExplosions.push_back(ex);*/
                 ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
                 playerExplosions.push_back(ex);
-                /* ------------------------------ */
 
                 if (player.GetLives() <= 0)
                     gameState = GAMEOVER;
@@ -432,11 +406,9 @@ case BOSS:
                 Vector2  c{ br.x + br.width * 0.5f, br.y + br.height * 0.5f };
 
                 Explosion ex;
-                //ex.Start(c, explBossTex, 4, 0.10f, 0.5f); // 4 columnas
-                //bossExplosions.push_back(ex);
                 ex.Start(c,          // posición
                     explBossTex,// textura de la explosión
-                    4,          // ? columnas que usa tu sprite-sheet
+                    4,          // columnas que usa tu sprite-sheet
                     0.10f,      // tiempo por fotograma
                     0.5f);     // escala
                 bossExplosions.push_back(ex);
@@ -493,7 +465,6 @@ break;
             bgAlpha = 1.0f;
             bgTransitionActive = false;
         }
-        /* ?? scroll del fondo-Boss ????????????????????????????? */
         if (gameState == BOSS || bgTransitionActive)
         {
             bossBgOffset += bossBgSpeed;
@@ -547,7 +518,7 @@ void Game::Draw()
     BeginDrawing();
     ClearBackground(BLACK);
 
-    /*???????????????? 1) FONDO NORMAL con scroll (solo si procede) ?????????????*/
+    /*????????????????  FONDO NORMAL con scroll (solo si procede) ?????????????*/
     bool mostrarFondoNormal = (gameState != BOSS) || bgTransitionActive;
 
     if (mostrarFondoNormal) {
@@ -557,7 +528,7 @@ void Game::Draw()
             yScroll - backgroundTexture.height, WHITE);
     }
 
-    /*???????????????? 2) FONDO-BOSS con scroll propio + alfa ???????????????????*/
+    /*????????????????  FONDO-BOSS con scroll propio + alfa ???????????????????*/
     if (gameState == BOSS || bgTransitionActive) {
         Color tint = WHITE;
         tint.a = (unsigned char)(bgAlpha * 255);   // 0–255
@@ -567,7 +538,7 @@ void Game::Draw()
             by - bossBackgroundTexture.height, tint);
     }
 
-    /*???????????????? 3) GAMEPLAY / HUD según estado ???????????????????????????*/
+    /*???????????????? GAMEPLAY / HUD según estado ???????????????????????????*/
     switch (gameState)
     {
     case MENU:
@@ -657,7 +628,6 @@ void Game::LaunchOrbitRing() {
         if (e.GetState() != EnemyState::FORMATION) continue;
         if (&e == anchor) continue;  // ancla queda quieta
 
-        // 25 % de probabilidad de dive inmediato
         if (GetRandomValue(0, 3) == 0) {
             e.StartDive();
         }
@@ -727,7 +697,7 @@ void Game::CheckAllEnemiesDefeated() {
         bossExplosions.clear();
         InitEnemies();             // misma formación / misma dificultad
     }
-    else                           // wave == 2  ?  Boss
+    else                           // wave == 2 diferente de Boss
     {
         wave = 0;
         for (auto& pb : playerBullets) pb.Deactivate();   // balas del jugador
@@ -788,7 +758,6 @@ void Game::BossAttack()
 {
     if (!boss.IsActive()) return;
 
-    /* 5 % de probabilidad cada frame ? lanza 3 balas rectas hacia abajo */
     if (GetRandomValue(0, 100) < 5)
     {
         int lanzadas = 0;
