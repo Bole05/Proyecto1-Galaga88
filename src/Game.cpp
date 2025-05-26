@@ -192,16 +192,26 @@ void Game::Init() {
              "enemy_2_processed1.png",          // enemy_3  violeta-azul
                                   
          };
-
          for (int i = 0; i < NUM_ENEMY_TYPES; ++i)
          {
              Texture2D tex = LoadTexture(enemyFiles[i]);
 
-             if (tex.id == 0)   // aviso si falta el archivo
-                 TraceLog(LOG_WARNING, "No se encontró %s", enemyFiles[i]);
-
-             enemyTextures.push_back(tex);
+             if (tex.id == 0) {                        // ? no se cargó
+                 TraceLog(LOG_WARNING,
+                     "No se encontró %s", enemyFiles[i]);
+                 //continue;                             // ? NO lo añadas
+             }
+             enemyTextures.push_back(tex);             // ? solo válidos
          }
+         //for (int i = 0; i < NUM_ENEMY_TYPES; ++i)
+         //{
+         //    Texture2D tex = LoadTexture(enemyFiles[i]);
+
+         //    if (tex.id == 0) {  // aviso si falta el archivo
+         //        TraceLog(LOG_WARNING, "No se encontró %s", enemyFiles[i]);
+         //    }
+         //    enemyTextures.push_back(tex);
+         //}
     }
 
     player.Init();
@@ -241,7 +251,8 @@ void Game::InitEnemies()
         e.SetRect(r);                    // (usa tu setter o toca directo)
 
         /* sprite aleatorio ----------------------------------*/
-        int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1);
+        /*int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1);*/
+        int type = GetRandomValue(0, (int)enemyTextures.size() - 1);
         e.SetSprite(enemyTextures[type]);   // 2 frames
     }
 }
@@ -675,6 +686,7 @@ void Game::UpdateEnemies() {
             er2.x + er2.width  < -20 ||   // se fue por la izq.
             er2.x              > SCREEN_WIDTH + 20 ||   // por la der.
             er2.y > SCREEN_HEIGHT + 20;     // por abajo
+        er2.y + er2.height < -20;
 
         if (fueraPantalla)
         {

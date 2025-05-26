@@ -20,7 +20,7 @@
 
 // Boss
 #define BOSS_LIFE        10
-#define BOSS_BULLET_SPEED 500
+#define BOSS_BULLET_SPEED 550
 #define MAX_BOSS_BULLETS  20
 
 // Estados del juego
