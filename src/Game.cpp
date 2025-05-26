@@ -333,10 +333,10 @@ void Game::Update() {
 
                     /* ---------- explosión del jugador ---------- */
                     Rectangle pr = player.GetRect();
-                    Vector2 center{ pr.x + pr.width * 0.5f, pr.y + pr.height * 0.5f };
+                    Vector2 center{pr.x + pr.width * 0.5f,pr.y + pr.height * (0.5f + 0.20f)};
 
                     Explosion ex;
-                    ex.Start(center, explPlayerTex, 4);   // 4 fotogramas
+                    ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);    // 4 fotogramas
                     playerExplosions.push_back(ex);
                     /* ------------------------------------------- */
 
@@ -400,10 +400,10 @@ void Game::Update() {
 
                     /* ---------- explosión del jugador ---------- */
                     Rectangle pr = player.GetRect();
-                    Vector2 center{ pr.x + pr.width * 0.5f, pr.y + pr.height * 0.5f };
+                    Vector2 center{ pr.x + pr.width * 0.5f,pr.y + pr.height * (0.5f + 0.20f) };
 
                     Explosion ex;
-                    ex.Start(center, explPlayerTex, 4);
+                    ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
                     playerExplosions.push_back(ex);
                     /* ------------------------------------------- */
 
