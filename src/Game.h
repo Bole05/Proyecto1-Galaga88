@@ -20,6 +20,8 @@ public:
     void Draw();
 
 private:
+    int wave = 1;
+
     void InitEnemies();
     void UpdateEnemies();
     void CheckAllEnemiesDefeated();
