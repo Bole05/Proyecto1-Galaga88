@@ -52,6 +52,7 @@ Game::~Game() {
     UnloadTexture(PlyBulletText);
     UnloadTexture(explPlayerTex);
     UnloadTexture(explBossTex);
+    UnloadTexture(enemyBulletTex);
 
     //audios
     UnloadSound(sfxPlayerShot);    
@@ -97,7 +98,14 @@ void Game::Init() {
         TraceLog(LOG_INFO, "ID textura Boss = %u", bossBackgroundTexture.id);
         UnloadImage(bossBgImg);
 
+        // bala enemigo
+        Image eBulletImg = LoadImage("gun-bullets-enemy2.png");   // tu sprite
+        ImageResize(&eBulletImg, 30, 30);                   // tamaño final
+        enemyBulletTex = LoadTextureFromImage(eBulletImg);
+        UnloadImage(eBulletImg);                            // ya no la necesitas
 
+        for (auto& b : enemyBullets)   // la misma textura para todas
+            b.SetTexture(enemyBulletTex);
 
         /* ---------- Parámetros del fundido ---------- */
         bgTransitionActive = false;
