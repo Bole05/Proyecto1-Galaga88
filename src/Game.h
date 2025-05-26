@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
-
+#define NOGDI          // evita conflicto MAX_PATH
+#define NOMINMAX 
 #include <vector>
 #include "Globals.h"
 #include "Player.h"
@@ -8,6 +9,7 @@
 #include "Boss.h"
 #include "Bullet.h"
 #include "raylib.h" 
+#include "Explosion.h"     
 class Game {
 public:
     Game();
@@ -75,6 +77,9 @@ private:
     float formationOffsetX;
     float formationDir;
     float formationSpeed;
+
+    Texture2D              explPlayerTex{};
+    std::vector<Explosion> playerExplosions;
 
 };
 

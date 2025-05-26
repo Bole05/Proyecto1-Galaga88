@@ -8,6 +8,7 @@
 #include <random>
 #include<vector>
 #include "raymath.h"  
+#include "Explosion.h"
 Game::Game()
     : gameState(MENU)
     , menuTexture{}
@@ -33,6 +34,8 @@ Game::Game()
     playerBullets.resize(MAX_BULLETS);
     enemyBullets.resize(MAX_ENEMY_BULLETS);
     bossBullets.resize(MAX_BOSS_BULLETS);
+    playerExplosions.reserve(4);
+
 }
 
 
@@ -47,6 +50,7 @@ Game::~Game() {
 
     UnloadTexture(bossTexture);
     UnloadTexture(PlyBulletText);
+    UnloadTexture(explPlayerTex);
 
     //audios
     UnloadSound(sfxPlayerShot);    
@@ -131,6 +135,8 @@ void Game::Init() {
          for (auto& b : playerBullets)  
              b.SetTexture(playerBulletTex);
 
+
+         explPlayerTex = LoadTexture("explosion.png");
          //Audios
          sfxPlayerShot = LoadSound("laser3.ogg");
          SetSoundVolume(sfxPlayerShot, 2.5f);
@@ -319,16 +325,27 @@ void Game::Update() {
                     eb.Deactivate();
                 }
 
-                if (CheckCollisionRecs(r, player.GetRect())) {
+                if (CheckCollisionRecs(r, player.GetRect()))
+                {
                     eb.Deactivate();
                     player.TakeDamage();
                     PlaySound(sfxPlayerHurt);
-                    if (player.GetLives() <= 0) {
-                        gameState = GAMEOVER;
-                    }
+
+                    /* ---------- explosión del jugador ---------- */
+                    Rectangle pr = player.GetRect();
+                    Vector2 center{ pr.x + pr.width * 0.5f, pr.y + pr.height * 0.5f };
+
+                    Explosion ex;
+                    ex.Start(center, explPlayerTex, 4);   // 4 fotogramas
+                    playerExplosions.push_back(ex);
+                    /* ------------------------------------------- */
+
+                    if (player.GetLives() <= 0) gameState = GAMEOVER;
+                }
+
                 }
             }
-        }
+        
 
         // Si matamos a todos -> Boss
         CheckAllEnemiesDefeated();
@@ -375,13 +392,24 @@ void Game::Update() {
                     bb.Deactivate();
                 }
 
-                if (CheckCollisionRecs(r, player.GetRect())) {
+                if (CheckCollisionRecs(r, player.GetRect()))
+                {
                     bb.Deactivate();
                     player.TakeDamage();
-                    if (player.GetLives() <= 0) {
-                        gameState = GAMEOVER;
-                    }
+                    PlaySound(sfxPlayerHurt);
+
+                    /* ---------- explosión del jugador ---------- */
+                    Rectangle pr = player.GetRect();
+                    Vector2 center{ pr.x + pr.width * 0.5f, pr.y + pr.height * 0.5f };
+
+                    Explosion ex;
+                    ex.Start(center, explPlayerTex, 4);
+                    playerExplosions.push_back(ex);
+                    /* ------------------------------------------- */
+
+                    if (player.GetLives() <= 0) gameState = GAMEOVER;
                 }
+
             }
         }
 
@@ -444,6 +472,12 @@ void Game::Update() {
         if (bossBgOffset >= bossBackgroundTexture.height)    // reinicia
             bossBgOffset = 0.0f;
     }
+    for (auto& ex : playerExplosions) ex.Update();
+
+    playerExplosions.erase(
+        std::remove_if(playerExplosions.begin(), playerExplosions.end(),
+            [](const Explosion& e) { return !e.IsActive(); }),
+        playerExplosions.end());
 
     /*????????????????  RÉCORD DE PUNTUACIÓN  ?????????????*/
     if ((gameState == GAMEOVER || gameState == WIN) && score > bestScore)
@@ -494,10 +528,10 @@ void Game::Draw()
         for (auto& e : enemies)                    // 2) recorre la lista
             if (e.IsActive())
                 e.Draw(pr);
-        if (gameState != BOSS)
+     /*   if (gameState != BOSS)
             for (auto& e : enemies)
                 if (e.IsActive())
-                    e.Draw();
+                    e.Draw();*/
  /*                   DrawTexture(enemyTexture,
                         (int)e.GetRect().x, (int)e.GetRect().y, WHITE);*/
 
@@ -528,7 +562,7 @@ void Game::Draw()
         DrawText("Press ENTER to return to MENU", SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2, 20, WHITE);
         break;
     }
-
+    for (const auto& ex : playerExplosions) ex.Draw();
     EndDrawing();
 }
 void Game::LaunchOrbitRing() {
