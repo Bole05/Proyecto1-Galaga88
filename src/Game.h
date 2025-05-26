@@ -53,7 +53,8 @@ private:
     static constexpr int NUM_ENEMY_TYPES = 5;
     std::vector<Texture2D> enemyTextures;
     Texture2D enemyBulletTex{};
-  
+    Texture2D bossBulletTex1{};   //  ? NUEVO
+    Texture2D bossBulletTex2{};
 
     //audios
     Sound sfxPlayerShot{};

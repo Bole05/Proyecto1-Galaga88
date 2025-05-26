@@ -53,7 +53,8 @@ Game::~Game() {
     UnloadTexture(explPlayerTex);
     UnloadTexture(explBossTex);
     UnloadTexture(enemyBulletTex);
-
+   /* UnloadTexture(bossBulletTex1);*/
+    UnloadTexture(bossBulletTex2);
     //audios
     UnloadSound(sfxPlayerShot);    
     UnloadSound(sfxEnemyHit);
@@ -106,7 +107,23 @@ void Game::Init() {
 
         for (auto& b : enemyBullets)   // la misma textura para todas
             b.SetTexture(enemyBulletTex);
+        ////bala boss
+        //Image bb1 = LoadImage("bullet boss1.png");
+        Image bb2 = LoadImage("bullet boss2.png");
+       /* ImageResize(&bb1, 40, 60);*/
+        ImageResize(&bb2, 60, 40);
+        ImageRotateCW(&bb2);
+        ImageRotateCW(&bb2);
+        ImageRotateCW(&bb2);
+        /*bossBulletTex1 = LoadTextureFromImage(bb1);     */     //  ? miembro
+        bossBulletTex2 = LoadTextureFromImage(bb2);          //  ? miembro
+        /*UnloadImage(bb1);*/
+        UnloadImage(bb2);
 
+        for (auto& b : bossBullets)                 // todas usan la misma
+            b.SetTexture(bossBulletTex2);
+        /*for (size_t i = 0; i < bossBullets.size(); ++i)*/
+            //bossBullets/*[i]*/.SetTexture((i & 1) ? bossBulletTex2 : bossBulletTex1);
         /* ---------- Parámetros del fundido ---------- */
         bgTransitionActive = false;
         bgAlpha = 0.0f;   // opacidad inicial
