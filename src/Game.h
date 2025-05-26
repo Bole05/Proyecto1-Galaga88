@@ -41,13 +41,17 @@ private:
     Texture2D backgroundTexture;
     Texture2D bossBackgroundTexture; 
   
+    Texture2D explBossTex{};
+  std::vector<Explosion> bossExplosions;
+
     Texture2D playerTexture;
-   /* Texture2D enemyTexture;*/
     Texture2D bossTexture; 
     Texture2D PlyBulletText;
 //Enemigos
     static constexpr int NUM_ENEMY_TYPES = 5;
     std::vector<Texture2D> enemyTextures;
+
+  
 
     //audios
     Sound sfxPlayerShot{};

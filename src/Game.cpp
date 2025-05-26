@@ -51,6 +51,7 @@ Game::~Game() {
     UnloadTexture(bossTexture);
     UnloadTexture(PlyBulletText);
     UnloadTexture(explPlayerTex);
+    UnloadTexture(explBossTex);
 
     //audios
     UnloadSound(sfxPlayerShot);    
@@ -96,6 +97,8 @@ void Game::Init() {
         TraceLog(LOG_INFO, "ID textura Boss = %u", bossBackgroundTexture.id);
         UnloadImage(bossBgImg);
 
+
+
         /* ---------- Parámetros del fundido ---------- */
         bgTransitionActive = false;
         bgAlpha = 0.0f;   // opacidad inicial
@@ -130,6 +133,8 @@ void Game::Init() {
 
 
          explPlayerTex = LoadTexture("explosion.png");
+         explBossTex = LoadTexture("explosion boss2.png");
+           
          //Audios
          sfxPlayerShot = LoadSound("laser3.ogg");
          SetSoundVolume(sfxPlayerShot, 2.5f);
@@ -332,6 +337,8 @@ void Game::Update() {
                     pr.y + pr.height * (0.5f + 0.20f)
                 };
                 Explosion ex;
+                /*ex.Start(center, explBossTex, 4, 0.10f, 1.4f);
+                bossExplosions.push_back(ex);*/
                 ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
                 playerExplosions.push_back(ex);
                 /* ------------------------------ */
@@ -350,88 +357,200 @@ void Game::Update() {
         }
         break;
     
-    case BOSS: {
-        player.Update();
-        boss.Update();
+    //case BOSS: {
+    //    player.Update();
+    //    boss.Update();
 
-        if (IsKeyPressed(KEY_SPACE))
-        {
-            for (auto& pb : playerBullets)
+    //    if (IsKeyPressed(KEY_SPACE))
+    //    {
+    //        for (auto& pb : playerBullets)
+    //        {
+    //    //        if (!pb.IsActive())
+    //    //        {
+    //    //            Rectangle pr = player.GetRect();                // ? caja nave
+    //    //            Vector2 pos{
+    //    //                pr.x + pr.width * 0.5f,   // centro horizontal
+    //    //                pr.y                       // borde superior de la nave
+    //    //            };
+
+    //    //            pb.Activate(pos);              // bala centrada
+    //    //            PlaySound(sfxPlayerShot);
+    //    //            break;
+    //    //        }
+    //    //    }
+    //    //}
+    //            if (CheckCollisionRecs(pb.GetRect(), boss.GetRect()))
+    //            {
+    //                pb.Deactivate();
+    //                boss.TakeDamage(1);
+    //                score += 50;
+
+    //                /* --- ¿se ha quedado sin vida? -------------------- */
+    //                if (boss.GetLife() <= 0)
+    //                {
+    //                    // 1) desactiva al jefe para que no se dibuje ni dispare
+    //                    boss.Activate(false);
+
+    //                    // 2) centra la explosión en el Boss
+    //                    Rectangle br = boss.GetRect();
+    //                    Vector2 center{
+    //                        br.x + br.width * 0.5f,
+    //                        br.y + br.height * 0.5f
+    //                    };
+
+    //                    Explosion ex;
+    //                    ex.Start(center,          // posición
+    //                        explBossTex,     // textura grande
+    //                        4,               // columnas (fotogramas)
+    //                        0.10f,           // 0.10 s entre frames
+    //                        1.4f);           // escala (140 %)
+    //                    bossExplosions.push_back(ex);
+
+    //                    PlaySound(sfxEnemyHit);   // (o un “boom” aparte)
+
+    //                    /* 3) NO cambies a WIN todavía; espera a que
+    //                           termine la animación en Update()           */
+    //                }
+    //            }
+    //    for (auto& pb : playerBullets) {
+    //        pb.Update();
+    //    }
+
+    //    // Boss
+    //    boss.Update();
+    //    BossAttack();
+
+    //    for (auto& bb : bossBullets) bb.Update();
+    //   
+    //    for (auto& bb : bossBullets)
+    //    {
+    //        if (!bb.IsActive()) continue;
+
+    //        Rectangle r = bb.GetRect();          // posición ya actualizada
+
+    //        // A) Se fue por la parte baja ? desactivar
+    //        if (r.y > SCREEN_HEIGHT)
+    //        {
+    //            bb.Deactivate();
+    //            continue;
+    //        }
+
+    //        // B) Impacta al jugador
+    //        if (CheckCollisionRecs(r, player.GetRect()))
+    //        {
+    //            bb.Deactivate();
+    //            player.TakeDamage();
+    //            PlaySound(sfxPlayerHurt);
+
+    //            // Explosión sobre la cabina
+    //            Rectangle pr = player.GetRect();
+    //            Vector2 center{
+    //                pr.x + pr.width * 0.5f,
+    //                pr.y + pr.height * (0.5f + 0.20f)
+    //            };
+    //            Explosion ex;
+    //            ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
+    //            playerExplosions.push_back(ex);
+
+    //            if (player.GetLives() <= 0)
+    //                gameState = GAMEOVER;
+    //        }
+    //    }
+
+    //    // Colisión de las balas del Player con el Boss
+    //    for (auto& pb : playerBullets) {
+    //        if (pb.IsActive() && boss.IsActive()) {
+    //            if (CheckCollisionRecs(pb.GetRect(), boss.GetRect())) {
+    //                pb.Deactivate();
+    //                boss.TakeDamage(1);
+    //                score += 50;
+    //                if (boss.GetLife() <= 0) {
+    //                    gameState = WIN;
+    //                }
+    //            }
+    //        }
+    //    }
+    //} break;
+case BOSS:
+{
+    player.Update();
+    boss.Update();
+
+    /* ---- DISPARO DEL JUGADOR ------------------------------------ */
+    if (IsKeyPressed(KEY_SPACE))
+    {
+        for (auto& pb : playerBullets)
+            if (!pb.IsActive())
             {
-                if (!pb.IsActive())
-                {
-                    Rectangle pr = player.GetRect();                // ? caja nave
-                    Vector2 pos{
-                        pr.x + pr.width * 0.5f,   // centro horizontal
-                        pr.y                       // borde superior de la nave
-                    };
-
-                    pb.Activate(pos);              // bala centrada
-                    PlaySound(sfxPlayerShot);
-                    break;
-                }
-            }
-        }
-        for (auto& pb : playerBullets) {
-            pb.Update();
-        }
-
-        // Boss
-        boss.Update();
-        BossAttack();
-
-        for (auto& bb : bossBullets) bb.Update();
-       
-        for (auto& bb : bossBullets)
-        {
-            if (!bb.IsActive()) continue;
-
-            Rectangle r = bb.GetRect();          // posición ya actualizada
-
-            // A) Se fue por la parte baja ? desactivar
-            if (r.y > SCREEN_HEIGHT)
-            {
-                bb.Deactivate();
-                continue;
-            }
-
-            // B) Impacta al jugador
-            if (CheckCollisionRecs(r, player.GetRect()))
-            {
-                bb.Deactivate();
-                player.TakeDamage();
-                PlaySound(sfxPlayerHurt);
-
-                // Explosión sobre la cabina
                 Rectangle pr = player.GetRect();
-                Vector2 center{
-                    pr.x + pr.width * 0.5f,
-                    pr.y + pr.height * (0.5f + 0.20f)
-                };
+                Vector2 pos{ pr.x + pr.width * 0.5f, pr.y };
+                pb.Activate(pos);
+                PlaySound(sfxPlayerShot);
+                break;
+            }
+    }
+
+    /* ---- BALAS DEL JUGADOR -------------------------------------- */
+    for (auto& pb : playerBullets)
+    {
+        pb.Update();
+
+        if (pb.IsActive() && boss.IsActive() &&
+            CheckCollisionRecs(pb.GetRect(), boss.GetRect()))
+        {
+            pb.Deactivate();
+            boss.TakeDamage(1);
+            score += 50;
+
+            if (boss.GetLife() <= 0 && boss.IsActive())
+            {
+                boss.Activate(false);            // lo ocultamos
+                Rectangle br = boss.GetRect();
+                Vector2  c{ br.x + br.width * 0.5f, br.y + br.height * 0.5f };
+
                 Explosion ex;
-                ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
-                playerExplosions.push_back(ex);
-
-                if (player.GetLives() <= 0)
-                    gameState = GAMEOVER;
+                //ex.Start(c, explBossTex, 4, 0.10f, 0.5f); // 4 columnas
+                //bossExplosions.push_back(ex);
+                ex.Start(c,          // posición
+                    explBossTex,// textura de la explosión
+                    4,          // ? columnas que usa tu sprite-sheet
+                    0.10f,      // tiempo por fotograma
+                    0.5f);     // escala
+                bossExplosions.push_back(ex);
             }
         }
+    }
 
-        // Colisión de las balas del Player con el Boss
-        for (auto& pb : playerBullets) {
-            if (pb.IsActive() && boss.IsActive()) {
-                if (CheckCollisionRecs(pb.GetRect(), boss.GetRect())) {
-                    pb.Deactivate();
-                    boss.TakeDamage(1);
-                    score += 50;
-                    if (boss.GetLife() <= 0) {
-                        gameState = WIN;
-                    }
-                }
-            }
+    /* ---- ATAQUE DEL BOSS ---------------------------------------- */
+    BossAttack();
+
+    /* ---- BALAS DEL BOSS ----------------------------------------- */
+    for (auto& bb : bossBullets) bb.Update();
+
+    for (auto& bb : bossBullets)
+    {
+        if (!bb.IsActive()) continue;
+
+        if (bb.GetRect().y > SCREEN_HEIGHT) { bb.Deactivate(); continue; }
+        if (CheckCollisionRecs(bb.GetRect(), player.GetRect()))
+        {
+            bb.Deactivate();
+            player.TakeDamage();
+            PlaySound(sfxPlayerHurt);
+
+            Rectangle pr = player.GetRect();
+            Vector2 center{ pr.x + pr.width * 0.5f,
+                            pr.y + pr.height * (0.5f + 0.20f) };
+
+            Explosion ex;
+            ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
+            playerExplosions.push_back(ex);
+
+            if (player.GetLives() <= 0) gameState = GAMEOVER;
         }
-    } break;
-
+    }
+}
+break;
     case GAMEOVER:
     case WIN:
         // Esperar ENTER para volver a MENU
@@ -476,18 +595,74 @@ void Game::Update() {
         if (bossBgOffset >= bossBackgroundTexture.height)    // reinicia
             bossBgOffset = 0.0f;
     }
+//    for (auto& ex : playerExplosions) ex.Update();
+//
+//    playerExplosions.erase(
+//        std::remove_if(playerExplosions.begin(), playerExplosions.end(),
+//            [](const Explosion& e) { return !e.IsActive(); }),
+//        playerExplosions.end());
+//
+//    for (auto& ex : bossExplosions) ex.Update();
+//
+//    bossExplosions.erase(
+//        std::remove_if(bossExplosions.begin(), bossExplosions.end(),
+//            [](const Explosion& e) { return !e.IsActive(); }),
+//        bossExplosions.end());
+//
+//    /*  Cuando no queden explosiones -> victoria */
+//    if (bossExplosions.empty() && !boss.IsActive() && gameState == BOSS)
+//        gameState = WIN;
+//
+//    /*????????????????  RÉCORD DE PUNTUACIÓN  ?????????????*/
+//    if ((gameState == GAMEOVER || gameState == WIN) && score > bestScore)
+//        bestScore = score;
+//
+//}
+//}
+//        /* ? Explosiones del jugador ? */
+//    for (auto& ex : playerExplosions) ex.Update();
+//    playerExplosions.erase(
+//        std::remove_if(playerExplosions.begin(), playerExplosions.end(),
+//            [](const Explosion& e) { return !e.IsActive(); }),
+//        playerExplosions.end());
+//
+//    /* ? Explosiones del Boss ? */
+//    for (auto& ex : bossExplosions) ex.Update();
+//    bossExplosions.erase(
+//        std::remove_if(bossExplosions.begin(), bossExplosions.end(),
+//            [](const Explosion& e) { return !e.IsActive(); }),
+//        bossExplosions.end());
+//
+//    if (bossExplosions.empty() && !boss.IsActive() && gameState == BOSS)
+//        gameState = WIN;
+//
+//    /* ? RÉCORD DE PUNTUACIÓN, etc. ? */
+//    if ((gameState == GAMEOVER || gameState == WIN) && score > bestScore)
+//        bestScore = score;
+//}
+//}
+//}
     for (auto& ex : playerExplosions) ex.Update();
-
     playerExplosions.erase(
         std::remove_if(playerExplosions.begin(), playerExplosions.end(),
             [](const Explosion& e) { return !e.IsActive(); }),
         playerExplosions.end());
 
-    /*????????????????  RÉCORD DE PUNTUACIÓN  ?????????????*/
+    for (auto& ex : bossExplosions) ex.Update();
+    bossExplosions.erase(
+        std::remove_if(bossExplosions.begin(), bossExplosions.end(),
+            [](const Explosion& e) { return !e.IsActive(); }),
+        bossExplosions.end());
+    for (const auto& ex : bossExplosions) ex.Draw();
+
+    /*  Cuando terminen las explosiones del Boss gana el jugador */
+    if (bossExplosions.empty() && !boss.IsActive() && gameState == BOSS)
+        gameState = WIN;
+
+    /* --------- récord de puntuación --------- */
     if ((gameState == GAMEOVER || gameState == WIN) && score > bestScore)
         bestScore = score;
-
-}
+    }
 
 void Game::Draw()
 {
@@ -562,6 +737,7 @@ void Game::Draw()
         break;
     }
     for (const auto& ex : playerExplosions) ex.Draw();
+    for (const auto& ex : bossExplosions)   ex.Draw();
     EndDrawing();
 }
 void Game::LaunchOrbitRing() {
@@ -617,6 +793,17 @@ void Game::UpdateEnemies() {
             }
         }
         e.Update();
+        Rectangle er2 = e.GetRect();
+        bool fueraPantalla =
+            er2.x + er2.width  < -20 ||   // se fue por la izq.
+            er2.x              > SCREEN_WIDTH + 20 ||   // por la der.
+            er2.y > SCREEN_HEIGHT + 20;     // por abajo
+
+        if (fueraPantalla)
+        {
+            e.Deactivate();
+            continue;                // pasamos al siguiente enemigo
+        }
 
         for (auto& pb : playerBullets)
         {
@@ -656,22 +843,58 @@ void Game::CheckAllEnemiesDefeated() {
 }
 
 void Game::EnemyAttack() {
+    //Rectangle pr = player.GetRect();
+    //Vector2 playerCenter{ pr.x + pr.width / 2, pr.y + pr.height / 2 };
+
+    //for (auto& e : enemies)
+    //{
+    //    if (!e.IsActive()) continue;
+    //    if (GetRandomValue(0, 100) < 2)          // 2 % prob.
+    //    {
+    //        for (auto& eb : enemyBullets)
+    //        {
+    //            if (!eb.IsActive())
+    //            {
+    //                Rectangle er = e.GetRect();
+    //                Vector2 enemyCenter{ er.x + er.width / 2, er.y + er.height / 2 };
+
+    //                Vector2 dir = Vector2Normalize(Vector2Subtract(playerCenter, enemyCenter));
+    //                Vector2 vel = Vector2Scale(dir, ENEMY_BULLET_SPEED);
+
+    //                eb.Activate(enemyCenter, vel);
+    //                break;
+    //            }
+    //        }
+    //    }
+    //}
     Rectangle pr = player.GetRect();
-    Vector2 playerCenter{ pr.x + pr.width / 2, pr.y + pr.height / 2 };
+    Vector2 playerCenter{ pr.x + pr.width * 0.5f,
+                          pr.y + pr.height * 0.5f };
 
     for (auto& e : enemies)
     {
         if (!e.IsActive()) continue;
-        if (GetRandomValue(0, 100) < 2)          // 2 % prob.
+
+        Rectangle er = e.GetRect();               // ? posición actual
+
+        // ????????? VISIBILIDAD ??????????
+        bool onScreen =
+            er.x + er.width > 0 && er.x < SCREEN_WIDTH &&
+            er.y + er.height > 0 && er.y < SCREEN_HEIGHT;
+        if (!onScreen) continue;                  // … si no se ve, no dispara
+        // ?????????????????????????????????
+
+        if (GetRandomValue(0, 100) < 2)           // 2 % de probabilidad
         {
             for (auto& eb : enemyBullets)
             {
                 if (!eb.IsActive())
                 {
-                    Rectangle er = e.GetRect();
-                    Vector2 enemyCenter{ er.x + er.width / 2, er.y + er.height / 2 };
+                    Vector2 enemyCenter{ er.x + er.width * 0.5f,
+                                         er.y + er.height * 0.5f };
 
-                    Vector2 dir = Vector2Normalize(Vector2Subtract(playerCenter, enemyCenter));
+                    Vector2 dir = Vector2Normalize(
+                        Vector2Subtract(playerCenter, enemyCenter));
                     Vector2 vel = Vector2Scale(dir, ENEMY_BULLET_SPEED);
 
                     eb.Activate(enemyCenter, vel);
