@@ -23,10 +23,26 @@ public:
     void Deactivate() { active = false; }
 
     void SetTexture(Texture2D tex) { bulletTexture = tex; }
+    Rectangle GetSweptRect() const
+    {
+        Rectangle r;
+        r.x = rect.x;
+        r.width = rect.width;
+        if (prevPos.y < rect.y) {           // bala hacia arriba
+            r.y = prevPos.y;
+            r.height = rect.y + rect.height - prevPos.y;
+        }
+        else {                              // (por si alguna mira abajo)
+            r.y = rect.y;
+            r.height = prevPos.y + rect.height - rect.y;
+        }
+        return r;
+    }
 
 private:
     bool    active = false;
     Vector2 velocity{};
+    Vector2 prevPos{};
     Texture2D bulletTexture{};
 };
 

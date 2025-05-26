@@ -12,20 +12,28 @@ void Bullet::Init()
     // la bala no necesita inicialización adicional
 }
 
-/* —— versión con dirección libre —— */
-void Bullet::Activate(const Vector2& pos, const Vector2& vel)
+void Bullet::Activate(const Vector2& pos)
 {
-    rect.x = pos.x - rect.width / 2;
-    rect.y = pos.y - rect.height / 2;
+    Vector2 vel{ 0, -BULLET_SPEED };
+    rect.x = pos.x - rect.width * 0.5f;
+    rect.y = pos.y - rect.height * 0.5f;
+
+    prevPos = { rect.x, rect.y };
     velocity = vel;
     active = true;
 }
 
-/* —— versión jugador vertical —— */
-void Bullet::Activate(const Vector2& pos)
+//-----------------------------------------------------
+// 3.  Activar bala con velocidad libre (enemigos / boss)
+//-----------------------------------------------------
+void Bullet::Activate(const Vector2& pos, const Vector2& vel)
 {
-    Vector2 vel{ 0, -BULLET_SPEED * 60.0f };   // ? multiplica por FPS
-    Activate(pos, vel);
+    rect.x = pos.x - rect.width * 0.5f;
+    rect.y = pos.y - rect.height * 0.5f;
+
+    prevPos = { rect.x, rect.y };
+    velocity = vel;
+    active = true;
 }
 
 /* ---------------- update ---------------------- */
@@ -33,12 +41,15 @@ void Bullet::Update()
 {
     if (!active) return;
 
+    /* guarda posición antes de mover */
+    prevPos = { rect.x, rect.y };
+
     float dt = GetFrameTime();
     rect.x += velocity.x * dt;
     rect.y += velocity.y * dt;
 
     if (rect.y < -rect.height || rect.y > SCREEN_HEIGHT ||
-        rect.x < -rect.width || rect.x >  SCREEN_WIDTH)
+        rect.x < -rect.width || rect.x > SCREEN_WIDTH)
         active = false;
 }
 

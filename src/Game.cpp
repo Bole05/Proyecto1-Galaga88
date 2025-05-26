@@ -109,13 +109,6 @@ void Game::Init() {
         ImageResize(&playerImg, 75, 75);
         playerTexture = LoadTextureFromImage(playerImg);
         UnloadImage(playerImg);
-       
-        
-        // Enemy
-     /*   Image enemyImg = LoadImage("fff.png");
-        ImageResize(&enemyImg, 40, 40);
-        enemyTexture = LoadTextureFromImage(enemyImg);
-        UnloadImage(enemyImg);*/
 
          //Boss
          Image bossImg = LoadImage("Arcade_-_Galaga_Arrangement_-_King_Galaspark-removebg-preview.png");
@@ -188,16 +181,6 @@ void Game::Init() {
 
 void Game::InitEnemies()
 {
-    //enemies.clear();
-    //enemies.resize(MAX_ENEMIES);
-
-    //for (auto& e : enemies)
-    //{
-    //    e.Init();   // posición, estado, etc.
-
-    //    int type = GetRandomValue(0, NUM_ENEMY_TYPES - 1); // 0..4
-    //    e.SetSprite(enemyTextures[type]);                  // 2 columnas
-    //}
     constexpr int COLS = 10;
     constexpr int ROWS = 3;
     bool used[ROWS][COLS] = {};          // todo a false
@@ -291,18 +274,25 @@ void Game::Update() {
         player.Update();
 
         // Player dispara
-        if (IsKeyPressed(KEY_SPACE)) {
-            for (auto& pb : playerBullets) {
-                if (!pb.IsActive()) {
-                    Rectangle pr = player.GetRect();
-                    Vector2 pos{ pr.x + pr.width / 2 - 5, pr.y };
-                    pb.Activate(pos);
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            for (auto& pb : playerBullets)
+            {
+                if (!pb.IsActive())
+                {
+                    Rectangle pr = player.GetRect();                // ? caja nave
+                    Vector2 pos{
+                        pr.x + pr.width * 0.5f,   // centro horizontal
+                        pr.y                       // borde superior de la nave
+                    };
 
+                    pb.Activate(pos);              // bala centrada
                     PlaySound(sfxPlayerShot);
                     break;
                 }
             }
         }
+        
 
         // Actualizar balas player
         for (auto& pb : playerBullets) {
@@ -313,39 +303,43 @@ void Game::Update() {
         // Enemigos
         UpdateEnemies();
         EnemyAttack();
+        for (auto& eb : enemyBullets) eb.Update();
 
-        // Balas de Enemigos
-        for (auto& eb : enemyBullets) {
-            if (eb.IsActive()) {
-                Rectangle r = eb.GetRect();
-                r.y += ENEMY_BULLET_SPEED;
-                eb.SetRect(r);
+        /*------------- COMPROBAR LÍMITES Y COLISIÓN ----------------------*/
+        for (auto& eb : enemyBullets)
+        {
+            if (!eb.IsActive()) continue;
 
-                if (r.y > SCREEN_HEIGHT) {
-                    eb.Deactivate();
-                }
+            Rectangle r = eb.GetRect();          // rectángulo actualizado
 
-                if (CheckCollisionRecs(r, player.GetRect()))
-                {
-                    eb.Deactivate();
-                    player.TakeDamage();
-                    PlaySound(sfxPlayerHurt);
-
-                    /* ---------- explosión del jugador ---------- */
-                    Rectangle pr = player.GetRect();
-                    Vector2 center{pr.x + pr.width * 0.5f,pr.y + pr.height * (0.5f + 0.20f)};
-
-                    Explosion ex;
-                    ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);    // 4 fotogramas
-                    playerExplosions.push_back(ex);
-                    /* ------------------------------------------- */
-
-                    if (player.GetLives() <= 0) gameState = GAMEOVER;
-                }
-
-                }
+            /* 1) fuera de pantalla ? desactivar */
+            if (r.y > SCREEN_HEIGHT) {
+                eb.Deactivate();
+                continue;
             }
-        
+
+            /* 2) colisión con el jugador */
+            if (CheckCollisionRecs(r, player.GetRect()))
+            {
+                eb.Deactivate();
+                player.TakeDamage();
+                PlaySound(sfxPlayerHurt);
+
+                /* --- explosión del jugador --- */
+                Rectangle pr = player.GetRect();
+                Vector2 center{
+                    pr.x + pr.width * 0.5f,
+                    pr.y + pr.height * (0.5f + 0.20f)
+                };
+                Explosion ex;
+                ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
+                playerExplosions.push_back(ex);
+                /* ------------------------------ */
+
+                if (player.GetLives() <= 0)
+                    gameState = GAMEOVER;
+            }
+        }
 
         // Si matamos a todos -> Boss
         CheckAllEnemiesDefeated();
@@ -360,15 +354,20 @@ void Game::Update() {
         player.Update();
         boss.Update();
 
-        if (IsKeyPressed(KEY_SPACE)) {
-            for (auto& pb : playerBullets) {
-                if (!pb.IsActive()) {
-                    Rectangle pr = player.GetRect();
-                    Vector2 pos{ pr.x + pr.width / 2 - 5, pr.y };
-                    pb.Activate(pos);
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            for (auto& pb : playerBullets)
+            {
+                if (!pb.IsActive())
+                {
+                    Rectangle pr = player.GetRect();                // ? caja nave
+                    Vector2 pos{
+                        pr.x + pr.width * 0.5f,   // centro horizontal
+                        pr.y                       // borde superior de la nave
+                    };
 
+                    pb.Activate(pos);              // bala centrada
                     PlaySound(sfxPlayerShot);
-
                     break;
                 }
             }
@@ -381,35 +380,40 @@ void Game::Update() {
         boss.Update();
         BossAttack();
 
-        // Balas del Boss
-        for (auto& bb : bossBullets) {
-            if (bb.IsActive()) {
-                Rectangle r = bb.GetRect();
-                r.y += BOSS_BULLET_SPEED;
-                bb.SetRect(r);
+        for (auto& bb : bossBullets) bb.Update();
+       
+        for (auto& bb : bossBullets)
+        {
+            if (!bb.IsActive()) continue;
 
-                if (r.y > SCREEN_HEIGHT) {
-                    bb.Deactivate();
-                }
+            Rectangle r = bb.GetRect();          // posición ya actualizada
 
-                if (CheckCollisionRecs(r, player.GetRect()))
-                {
-                    bb.Deactivate();
-                    player.TakeDamage();
-                    PlaySound(sfxPlayerHurt);
+            // A) Se fue por la parte baja ? desactivar
+            if (r.y > SCREEN_HEIGHT)
+            {
+                bb.Deactivate();
+                continue;
+            }
 
-                    /* ---------- explosión del jugador ---------- */
-                    Rectangle pr = player.GetRect();
-                    Vector2 center{ pr.x + pr.width * 0.5f,pr.y + pr.height * (0.5f + 0.20f) };
+            // B) Impacta al jugador
+            if (CheckCollisionRecs(r, player.GetRect()))
+            {
+                bb.Deactivate();
+                player.TakeDamage();
+                PlaySound(sfxPlayerHurt);
 
-                    Explosion ex;
-                    ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
-                    playerExplosions.push_back(ex);
-                    /* ------------------------------------------- */
+                // Explosión sobre la cabina
+                Rectangle pr = player.GetRect();
+                Vector2 center{
+                    pr.x + pr.width * 0.5f,
+                    pr.y + pr.height * (0.5f + 0.20f)
+                };
+                Explosion ex;
+                ex.Start(center, explPlayerTex, 4, 0.08f, 0.55f);
+                playerExplosions.push_back(ex);
 
-                    if (player.GetLives() <= 0) gameState = GAMEOVER;
-                }
-
+                if (player.GetLives() <= 0)
+                    gameState = GAMEOVER;
             }
         }
 
@@ -528,12 +532,7 @@ void Game::Draw()
         for (auto& e : enemies)                    // 2) recorre la lista
             if (e.IsActive())
                 e.Draw(pr);
-     /*   if (gameState != BOSS)
-            for (auto& e : enemies)
-                if (e.IsActive())
-                    e.Draw();*/
- /*                   DrawTexture(enemyTexture,
-                        (int)e.GetRect().x, (int)e.GetRect().y, WHITE);*/
+
 
         if (bossActive && boss.IsActive()) {
             boss.Draw();
@@ -619,14 +618,14 @@ void Game::UpdateEnemies() {
         }
         e.Update();
 
-        for (auto& pb : playerBullets) {
-            if (pb.IsActive() && CheckCollisionRecs(pb.GetRect(), e.GetRect())) {
+        for (auto& pb : playerBullets)
+        {
+            if (pb.IsActive() && CheckCollisionRecs(pb.GetSweptRect(), e.GetHitBox()))
+            {
                 pb.Deactivate();
                 e.Deactivate();
-
-                PlaySound(sfxEnemyHit);
                 score += 10;
-                break;
+                break;                      // sal del bucle de balas
             }
         }
     }
@@ -657,22 +656,6 @@ void Game::CheckAllEnemiesDefeated() {
 }
 
 void Game::EnemyAttack() {
-   /* for (auto& e : enemies) {
-        if (!e.IsActive()) continue;
-
-        if (GetRandomValue(0, 100) < 0.5) {  
-            for (auto& eb : enemyBullets) {
-                if (!eb.IsActive()) {
-                    Rectangle er = e.GetRect();
-                    Vector2 pos{ er.x + er.width / 2 - 5, er.y + er.height };
-                    eb.Activate(pos);
-                    break;
-                }
-            }
-        }
-    }*/
-
-
     Rectangle pr = player.GetRect();
     Vector2 playerCenter{ pr.x + pr.width / 2, pr.y + pr.height / 2 };
 
@@ -699,18 +682,25 @@ void Game::EnemyAttack() {
     }
 }
 
-void Game::BossAttack() {
+void Game::BossAttack()
+{
     if (!boss.IsActive()) return;
-    // 3 balas de golpe
-    if (GetRandomValue(0, 100) < 5) {
-        int count = 0;
-        for (auto& bb : bossBullets) {
-            if (!bb.IsActive()) {
+
+    /* 5 % de probabilidad cada frame ? lanza 3 balas rectas hacia abajo */
+    if (GetRandomValue(0, 100) < 5)
+    {
+        int lanzadas = 0;
+        for (auto& bb : bossBullets)
+        {
+            if (!bb.IsActive())
+            {
                 Rectangle br = boss.GetRect();
-                Vector2 pos{ br.x + br.width / 2 - 5, br.y + br.height };
-                bb.Activate(pos);
-                count++;
-                if (count >= 3) break; // 3 balas
+                Vector2 pos{ br.x + br.width * 0.5f,  br.y + br.height };
+
+                Vector2 vel{ 0,  BOSS_BULLET_SPEED };   // ? recto
+                bb.Activate(pos, vel);                  // activa bala
+
+                if (++lanzadas == 3) break;             // solo 3 balas
             }
         }
     }

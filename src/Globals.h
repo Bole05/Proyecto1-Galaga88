@@ -10,17 +10,17 @@
 #define PLAYER_LIFE  3
 
 // Balas
-#define BULLET_SPEED 10
+#define BULLET_SPEED 700
 #define MAX_BULLETS  10
 
 // Enemigos
 #define MAX_ENEMIES       20
-#define ENEMY_BULLET_SPEED 8
+#define ENEMY_BULLET_SPEED 400
 #define MAX_ENEMY_BULLETS 10
 
 // Boss
 #define BOSS_LIFE        10
-#define BOSS_BULLET_SPEED 12
+#define BOSS_BULLET_SPEED 500
 #define MAX_BOSS_BULLETS  20
 
 // Estados del juego

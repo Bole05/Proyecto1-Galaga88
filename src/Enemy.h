@@ -35,7 +35,15 @@ public:
     void  ApplyGroupOffset(float dx) { rect.x = formationPos.x + dx; }
     void  SetGroupOffset(float dx) { groupOffset = dx; }
     
-
+    Rectangle GetHitBox() const
+    {
+        Rectangle r = rect;          // copia del rectángulo actual
+        r.x += r.width * 0.10f;     // 10 % de margen a cada lado
+        r.y += r.height * 0.10f;
+        r.width *= 0.80f;           // 80 % del ancho original
+        r.height *= 0.80f;           // 80 % del alto
+        return r;
+    }
 
 
 private:

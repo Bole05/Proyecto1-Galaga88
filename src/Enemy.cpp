@@ -145,40 +145,6 @@ void Enemy::Draw()
 
 void Enemy::Draw(const Rectangle& playerRect)
 {
-   // if (!active) return;
-
-   // // ------- parámetros de escala -------
-   // const float scale = 0.6f;           // 40 % más pequeño
-
-   // if (sprite.id != 0)
-   // {
-   //     int fw = sprite.width / frameCols;
-   //     int fh = sprite.height;
-
-   //     Rectangle src{ (float)(currentFrame * fw), 0.0f,
-   //                    (float)fw, (float)fh };
-
-   //     float dw = rect.width * scale;
-   //     float dh = rect.height * scale;
-
-   //     Rectangle dst{
-   //         rect.x + (rect.width - dw) * 0.5f,
-   //         rect.y + (rect.height - dh) * 0.5f,
-   //         dw, dh
-   //     };
-
-   //     // ángulo hacia el jugador
-   ///*     Vector2 ePos{ rect.x + rect.width / 2,  rect.y + rect.height / 2 };
-   //     Vector2 pPos{ playerRect.x + playerRect.width / 2,
-   //                   playerRect.y + playerRect.height / 2 };
-
-   //     float angle = atan2f(pPos.y - ePos.y, pPos.x - ePos.x) * RAD2DEG + 90.0f;
-
-   //     DrawTexturePro(sprite, src, dst,
-   //         { dw / 2.0f, dh / 2.0f },
-   //         angle,
-   //         WHITE);*/
-   // }
     if (!active) return;
 
     if (sprite.id != 0)
