@@ -19,7 +19,7 @@
 
 ### Controls:
 
-- **Arrow Keys**: Move the spaceship up, down, left, and right.
+- **Arrow Keys**: Move the spaceship left and right.
 - **Spacebar**: Shoot.
 - **Esc**: Exit the game.
 - **Enter**: Strat the game.
