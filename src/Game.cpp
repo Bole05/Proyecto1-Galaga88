@@ -100,7 +100,7 @@ void Game::Init() {
 
         // bala enemigo
         Image eBulletImg = LoadImage("gun-bullets-enemy2.png");   // tu sprite
-        ImageResize(&eBulletImg, 30, 30);                   // tamaño final
+        ImageResize(&eBulletImg, 25, 25);                   // tamaño final
         enemyBulletTex = LoadTextureFromImage(eBulletImg);
         UnloadImage(eBulletImg);                            // ya no la necesitas
 
